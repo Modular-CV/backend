@@ -5,15 +5,16 @@
     "yarn": ">= 4"
   },
   "scripts": {
-    "start": "yarn tsx src/server.ts",
+    "compose:start": "docker compose start",
+    "compose:up": "docker compose up --detach",
+    "compose:down": "docker compose down",
     "dev": "yarn dev:db; yarn migrate; nodemon --watch src -e ts",
-    "dev:db": "yarn docker:compose:up; echo '\n🙀 Postgres Adminer: http://localhost:9090 🙀\n😼 Postgres Port: 5432 😼\n'",
-    "migrate": "yarn prisma migrate dev",
-    "docker:compose:up": "docker compose up --detach",
-    "docker:compose:down": "docker compose down",
-    "lint": "yarn eslint",
+    "dev:db": "yarn compose:start; echo '\n🙀 Postgres Adminer: http://localhost:9090 🙀\n😼 Postgres Port: 5432 😼\n'",
     "format": "yarn prettier . --write",
-    "prepare": "husky"
+    "lint": "yarn eslint",
+    "migrate": "yarn prisma migrate dev",
+    "prepare": "husky",
+    "start": "yarn tsx src/server.ts"
   },
   "packageManager": "yarn@4.5.2",
   "dependencies": {
