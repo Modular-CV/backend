@@ -21,7 +21,7 @@ This is the backend for a curriculum builder project: a modular and free-to-use 
 [<img src="https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white">](https://jestjs.io/)
 [<img src="https://img.shields.io/badge/Babel-F9DC3e?style=for-the-badge&logo=babel&logoColor=black">](https://babeljs.io/)
 
-- [supertest](https://ladjs.github.io/superagent/)
+- [supertest](https://ladjs.github.io/superagent/) 😎
 
 ### Linting and Formatting
 
@@ -39,21 +39,22 @@ This is the backend for a curriculum builder project: a modular and free-to-use 
 [<img src="https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens">](https://jwt.io/)
 [<img src="https://img.shields.io/badge/zod-%233068b7.svg?style=for-the-badge&logo=zod&logoColor=white">](https://zod.dev/)
 
-- [Nodemailer](https://www.nodemailer.com/)
-- [Argon2](https://www.argon2.com/)
+- [Argon2](https://www.argon2.com/) 🔐
+- [Faker](https://fakerjs.dev/) 🪄
 - [Husky](https://typicode.github.io/husky/) 🐶
+- [Nodemailer](https://www.nodemailer.com/) 💌
 
 ### Recommended extensions for VS Code
 
-- [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
-- [Docker](https://code.visualstudio.com/docs/containers/overview)
-- [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
-- [GitHub Pull Requests](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-pull-request-github)
-- [GitLens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)
-- [Postman](https://marketplace.visualstudio.com/items?itemName=Postman.postman-for-vscode)
-- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-- [Prisma](https://marketplace.visualstudio.com/items?itemName=Prisma.prisma)
-- [WSL](https://code.visualstudio.com/docs/remote/wsl)
+- [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker) ✍️
+- [Docker](https://code.visualstudio.com/docs/containers/overview) 🐳
+- [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) 🛠️
+- [GitHub Pull Requests](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-pull-request-github) 🔗
+- [GitLens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens) 🔍
+- [Postman](https://marketplace.visualstudio.com/items?itemName=Postman.postman-for-vscode) 📫
+- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) 🎨
+- [Prisma](https://marketplace.visualstudio.com/items?itemName=Prisma.prisma) 📊
+- [WSL](https://code.visualstudio.com/docs/remote/wsl) 🖥️
 
 > [!NOTE]
 > We strongly recommend using the Windows Subsystem Linux (WSL) for development.
