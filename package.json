@@ -1,0 +1,44 @@
+{
+  "name": "backend",
+  "engines": {
+    "npm": "echo 'npm is forbidden - use yarn instead'",
+    "yarn": ">= 4"
+  },
+  "scripts": {
+    "start": "yarn tsx src/server.ts",
+    "dev": "yarn dev:db; yarn migrate; nodemon --watch src -e ts",
+    "dev:db": "yarn docker:compose:up; echo '\n🙀 Postgres Adminer: http://localhost:9090 🙀\n😼 Postgres Port: 5432 😼\n'",
+    "migrate": "yarn prisma migrate dev",
+    "docker:compose:up": "docker compose up --detach",
+    "docker:compose:down": "docker compose down",
+    "lint": "yarn eslint",
+    "format": "yarn prettier . --write",
+    "prepare": "husky"
+  },
+  "packageManager": "yarn@4.5.2",
+  "dependencies": {
+    "@prisma/client": "6.1.0",
+    "argon2": "^0.41.1",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.16",
+    "prisma": "^6.1.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/nodemailer": "^6",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.14.0",
+    "husky": "^9.1.7",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.1"
+  }
+}

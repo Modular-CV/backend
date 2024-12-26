@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "streetsidesoftware.code-spell-checker",
+    "dbaeumer.vscode-eslint",
+    "github.vscode-pull-request-github",
+    "eamodio.gitlens",
+    "postman.postman-for-vscode",
+    "esbenp.prettier-vscode"
+  ]
+}
