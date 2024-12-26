@@ -19,4 +19,4 @@ const serverListenMessage = () => {
   console.log(`\nServer is running on ${DOMAIN}\n`)
 }
 
-server.listen(PORT, serverListenMessage)
+export default server.listen(PORT, serverListenMessage)
