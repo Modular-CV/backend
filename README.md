@@ -34,28 +34,51 @@ This is the backend for a curriculum builder project: a modular and free-to-use 
 ### Others
 
 [<img src="https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens">](https://jwt.io/)
+[<img src="https://img.shields.io/badge/zod-%233068b7.svg?style=for-the-badge&logo=zod&logoColor=white">](https://zod.dev/)
+
+- [Nodemailer](https://www.nodemailer.com/)
+- [Argon2](https://www.argon2.com/)
+- [Husky](https://typicode.github.io/husky/) 🐶
 
 ### Recommended extensions for VS Code
 
-- [WSL](https://code.visualstudio.com/docs/remote/wsl)
 - [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
+- [Docker](https://code.visualstudio.com/docs/containers/overview)
 - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
 - [GitHub Pull Requests](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-pull-request-github)
 - [GitLens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)
 - [Postman](https://marketplace.visualstudio.com/items?itemName=Postman.postman-for-vscode)
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 - [Prisma](https://marketplace.visualstudio.com/items?itemName=Prisma.prisma)
+- [WSL](https://code.visualstudio.com/docs/remote/wsl)
 
 > [!NOTE]
 > We strongly recommend using the Windows Subsystem Linux (WSL) for development.
 
 ## How to start
 
+> [!NOTE]
+> Before we start, you need to have Docker set up and running.
+
 1. Clone this repository using git
-2. Create a `.env.yarn` file with the following content in the root of your folder:
+2. Create a `.env.local` file with the following content in the root of your folder:
    ```
-   PORT=8080
+   PORT="8080"
+   PROJECT_NAME="Modular CV"
+   DOMAIN="http://localhost:8080"
+   TOKEN_SECRET="Secret"
+   PEPPER_SECRET="Secret"
+   NODE_MAILER_SERVICE="your email provider"
+   NODE_MAILER_USER="your email"
+   NODE_MAILER_PASS="your app password"
+   NODE_MAILER_SENDER="your email"
    ```
-3. In your terminal:
+3. Create a `.env` file with the following content in the root of your folder:
+   ```
+   DATABASE_URL="postgresql://admin:admin@localhost:5432/cv?schema=public"
+   ```
+4. In your terminal:
    1. `yarn install`
-   2. `yarn dev`
+   2. `yarn compose:up`
+   3. `yarn dev`
+   4. Done!🫖
