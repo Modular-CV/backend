@@ -8,14 +8,16 @@
     "compose:start": "docker compose start",
     "compose:up": "docker compose up --detach",
     "compose:down": "docker compose down",
-    "dev": "yarn dev:db; yarn migrate; nodemon --watch src -e ts",
-    "dev:db": "yarn compose:start; echo '\n🙀 Postgres Adminer: http://localhost:9090 🙀\n😼 Postgres Port: 5432 😼\n'",
+    "dev": "yarn dev:db; yarn migrate:dev; nodemon --watch src --extension ts",
+    "dev:db": "yarn compose:start; echo '\n🙀 Postgres Adminer: http://localhost:49300 🙀\n😼 Postgres Port: 5432 😼\n'",
     "format": "yarn prettier . --write",
     "lint": "yarn eslint",
-    "migrate": "yarn prisma migrate dev",
+    "migrate:dev": "yarn prisma migrate dev",
+    "migrate:prod": "yarn prisma migrate deploy",
+    "migrate:reset": "yarn prisma migrate reset",
     "prepare": "husky",
     "start": "yarn tsx src/server.ts",
-    "test": "jest"
+    "test": "yarn migrate:reset --force; jest --detectOpenHandles"
   },
   "packageManager": "yarn@4.5.2",
   "dependencies": {
@@ -32,6 +34,7 @@
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-typescript": "^7.26.0",
     "@eslint/js": "^9.17.0",
+    "@faker-js/faker": "^9.3.0",
     "@types/babel__core": "^7",
     "@types/babel__preset-env": "^7",
     "@types/express": "^5.0.0",
