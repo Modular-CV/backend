@@ -11,7 +11,17 @@
 
 #!.yarn/cache
 .pnp.*
-tests/coverage
+
+# Node
 node_modules
-.env*
+
+# Jest
+tests/coverage
+
+# VS Code
 *.code-workspace
+
+# Environment files
+.env*
+# Allow development
+!.env.development
