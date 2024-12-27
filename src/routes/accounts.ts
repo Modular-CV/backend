@@ -53,7 +53,7 @@ accountsRouter.get('/accounts', async ({ query }, response) => {
       },
     })
   }
-  response.json()
+  response.json({ message: 'Email validation successful' })
 })
 
 accountsRouter.post('/accounts', async ({ body: data }, response) => {
@@ -85,26 +85,12 @@ accountsRouter.post('/accounts', async ({ body: data }, response) => {
     return
   }
 
-  const pepper = process.env.PEPPER_SECRET
-  data.password = await argon2.hash(`${pepper}:${data.password}`)
-
-  const account = await prisma.account.create({ data: data })
-
-  const token = crypto.randomUUID()
-
-  await prisma.verificationToken.create({
-    data: {
-      token,
-      accountId: account.id,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    },
-  })
-
   const domain = process.env.DOMAIN
   const projectName = process.env.PROJECT_NAME
   const emailSender = process.env.NODE_MAILER_SENDER
+  const token = crypto.randomUUID()
 
-  sendMail({
+  const result = await sendMail({
     sender: emailSender,
     subject: `${projectName} - Please Verify Your Email Address`,
     to: data.email,
@@ -115,6 +101,28 @@ accountsRouter.post('/accounts', async ({ body: data }, response) => {
       <p>To complete your registration, please verify your email by clicking <a href="${domain}/accounts?verificationToken=${token}">here</a>.</p>
     </div>
     `,
+  })
+
+  if (result.rejected.length) {
+    console.log(result)
+    response.status(500)
+    response.json({
+      message: 'Account creation failed: Email could not be sent',
+    })
+    return
+  }
+
+  const pepper = process.env.PEPPER_SECRET
+  data.password = await argon2.hash(`${pepper}:${data.password}`)
+
+  const account = await prisma.account.create({ data: data })
+
+  await prisma.verificationToken.create({
+    data: {
+      token,
+      accountId: account.id,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    },
   })
 
   response.json(account)
