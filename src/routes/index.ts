@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client'
+import rootRouter from './root'
+import accountsRouter from './accounts'
 
-export const prisma = new PrismaClient({
+const prisma = new PrismaClient({
   omit: {
     account: {
       password: true,
@@ -8,7 +10,4 @@ export const prisma = new PrismaClient({
   },
 })
 
-import rootRouter from './root'
-import accountsRouter from './accounts'
-
-export { rootRouter, accountsRouter }
+export { rootRouter, accountsRouter, prisma }

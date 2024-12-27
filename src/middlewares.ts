@@ -24,9 +24,16 @@ export const authenticateSessionToken: RequestHandler = (
 
   jwt.verify(token, process.env.TOKEN_SECRET, (error, user) => {
     if (error) {
-      console.warn(error.message)
-      if (error.message === 'invalid token')
-        response.status(403).json({ message: 'invalid token' })
+      switch (error.message) {
+        case 'invalid token': {
+          response.status(403).json({ message: 'invalid token' })
+          break
+        }
+        default: {
+          response.status(403).json({ message: 'invalid token' })
+          break
+        }
+      }
       return
     }
 
