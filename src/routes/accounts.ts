@@ -18,30 +18,20 @@ accountsRouter.get('/accounts', async ({ query }, response) => {
       where: { token: verificationTokenQuery },
     })
 
-    const validatorObject = z.object(
-      {
-        id: z.number(),
-        expiresAt: z.date().refine((expiresAt) => {
-          return new Date(expiresAt).getTime() >= new Date().getTime()
-        }, 'Expired token'),
-        isUsed: z.boolean().refine((isUsed) => isUsed === false, 'Used token'),
-      },
-      {
-        message: 'Invalid Token',
-      },
-    )
+    const isInvalidValidToken =
+      !verificationToken ||
+      new Date().getTime() >= new Date(verificationToken.expiresAt).getTime() ||
+      verificationToken.isUsed
 
-    const validator = validatorObject.safeParse(verificationToken)
-
-    if (!validator.success) {
+    if (isInvalidValidToken) {
       response.status(400)
-      response.json(validator.error.format())
+      response.json({ message: 'Invalid, expired or used verification token' })
       return
     }
 
     await prisma.verificationToken.update({
       where: {
-        id: validator.data.id,
+        id: verificationToken.id,
       },
       data: {
         isUsed: true,
@@ -53,27 +43,13 @@ accountsRouter.get('/accounts', async ({ query }, response) => {
       },
     })
   }
+
   response.json({ message: 'Email validation successful' })
 })
 
 accountsRouter.post('/accounts', async ({ body: data }, response) => {
-  const isEmailRegistered = async () => {
-    const count = await prisma.account.count({
-      where: {
-        email: data.email,
-      },
-    })
-
-    return count === 0
-  }
-
   const validatorObject = z.object({
-    email: z
-      .string()
-      .email()
-      .refine(async () => {
-        return await isEmailRegistered()
-      }, 'Email registered'),
+    email: z.string().email(),
     password: z.string().min(4),
   }) satisfies z.Schema<Prisma.AccountCreateInput>
 
@@ -82,6 +58,18 @@ accountsRouter.post('/accounts', async ({ body: data }, response) => {
   if (!validator.success) {
     response.status(400)
     response.json(validator.error.format())
+    return
+  }
+
+  const count = await prisma.account.count({
+    where: {
+      email: data.email,
+    },
+  })
+
+  if (count) {
+    response.status(409)
+    response.json({ message: 'Email is already registered' })
     return
   }
 
@@ -112,8 +100,8 @@ accountsRouter.post('/accounts', async ({ body: data }, response) => {
     return
   }
 
-  const pepper = process.env.PEPPER_SECRET
-  data.password = await argon2.hash(`${pepper}:${data.password}`)
+  const secret = Buffer.from(process.env.PEPPER_SECRET, 'utf-8')
+  data.password = await argon2.hash(data.password, { secret })
 
   const account = await prisma.account.create({ data: data })
 
@@ -125,7 +113,7 @@ accountsRouter.post('/accounts', async ({ body: data }, response) => {
     },
   })
 
-  response.json(account)
+  response.json({ account })
 })
 
 export default accountsRouter
