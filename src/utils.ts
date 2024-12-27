@@ -33,5 +33,12 @@ export const sendMail = async (mailOptions: MailOptions) => {
 
   const mailerTransporter = nodemailer.createTransport(mailConfig)
 
-  return await mailerTransporter.sendMail(mailOptions)
+  const response = await mailerTransporter.sendMail(mailOptions)
+
+  if (process.env.NODE_ENV !== 'production')
+    console.log(
+      'Email Sent! Preview URL: ' + nodemailer.getTestMessageUrl(response),
+    )
+
+  return response
 }
