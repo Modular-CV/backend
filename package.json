@@ -8,7 +8,7 @@
     "compose:start": "docker compose start",
     "compose:up": "docker compose up --detach",
     "compose:down": "docker compose down",
-    "dev": "yarn dev:db; yarn migrate:dev; nodemon --watch src --extension ts",
+    "dev": "yarn dev:db; yarn migrate:reset; nodemon --watch src --ext ts",
     "dev:db": "yarn compose:start; echo '\n🙀 Postgres Adminer: http://localhost:49300 🙀\n😼 Postgres Port: 5432 😼\n'",
     "format": "yarn prettier . --write",
     "lint": "yarn eslint",
