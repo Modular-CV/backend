@@ -65,27 +65,7 @@ This is the backend for a curriculum builder project: a modular and free-to-use 
 > Before we start, you need to have Docker set up and running.
 
 1. Clone this repository using git
-2. Create a `.env.local` file with the following content in the root of your folder:
-
-   ```
-   PORT="8080"
-   PROJECT_NAME="Modular CV"
-   DOMAIN="http://localhost:8080"
-   TOKEN_SECRET="Secret"
-   PEPPER_SECRET="Secret"
-   NODE_MAILER_SERVICE="your email provider"
-   NODE_MAILER_USER="your email"
-   NODE_MAILER_PASS="your app password"
-   NODE_MAILER_SENDER="your email"
-   ```
-
-3. Create a `.env` file with the following content in the root of your folder:
-
-   ```
-   DATABASE_URL="postgresql://admin:admin@localhost:5432/cv?schema=public"
-   ```
-
-4. In your terminal:
+2. In your terminal:
    1. `yarn install`
    2. `yarn compose:up`
    3. `yarn dev`
