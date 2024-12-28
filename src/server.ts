@@ -1,6 +1,5 @@
 import express from 'express'
-import { rootRouter, accountsRouter } from './routes'
-import sessionsRouter from './routes/sessions'
+import { rootRouter, accountsRouter, sessionsRouter } from './routes'
 
 const PORT = process.env.PORT
 const DOMAIN = process.env.DOMAIN

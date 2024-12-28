@@ -1,7 +1,21 @@
 import jwt from 'jsonwebtoken'
 import nodemailer from 'nodemailer'
 import { MailOptions } from 'nodemailer/lib/sendmail-transport'
+import argon2 from 'argon2'
 import SMTPTransport from 'nodemailer/lib/smtp-transport'
+
+export const generateSecurePassword = async (password: string) => {
+  const secret = Buffer.from(process.env.PEPPER_SECRET, 'utf-8')
+  return await argon2.hash(password, { secret })
+}
+
+export const verifySecurePassword = async (
+  digest: string,
+  password: string,
+) => {
+  const secret = Buffer.from(process.env.PEPPER_SECRET, 'utf-8')
+  return await argon2.verify(digest, password, { secret })
+}
 
 export const generateSessionToken = (userName: string) => {
   const tokenSecret = process.env.TOKEN_SECRET

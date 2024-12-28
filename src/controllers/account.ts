@@ -1,13 +1,10 @@
-import { z } from 'zod'
-import argon2 from 'argon2'
-import { prisma } from '.'
 import { Prisma } from '@prisma/client'
-import { sendMail } from '../utils'
-import express from 'express'
+import { prisma } from '.'
+import { generateSecurePassword, sendMail } from '../utils'
+import { z } from 'zod'
+import { ErrorCodes } from '../types'
 
-const accountsRouter = express.Router()
-
-accountsRouter.get('/accounts', async ({ query }, response) => {
+export const get: RequestHandler = async ({ query }, response) => {
   const verificationTokenQuery =
     typeof query.verificationToken === 'string'
       ? query.verificationToken
@@ -25,7 +22,11 @@ accountsRouter.get('/accounts', async ({ query }, response) => {
 
     if (isInvalidValidToken) {
       response.status(400)
-      response.json({ message: 'Invalid, expired or used verification token' })
+      response.json({
+        status: 'ERROR',
+        message: ErrorCodes['VER-001'],
+        error: 'VER-001',
+      })
       return
     }
 
@@ -42,24 +43,39 @@ accountsRouter.get('/accounts', async ({ query }, response) => {
         },
       },
     })
+
+    response.json({
+      status: 'SUCCESS',
+      message: 'Email validation successful',
+    })
+    return
   }
 
-  response.json({ message: 'Email validation successful' })
-})
+  response.json()
+}
 
-accountsRouter.post('/accounts', async ({ body: data }, response) => {
+export const post: RequestHandler = async ({ body }, response) => {
   const validatorObject = z.object({
     email: z.string().email(),
     password: z.string().min(4),
   }) satisfies z.Schema<Prisma.AccountCreateInput>
 
-  const validator = await validatorObject.safeParseAsync(data)
+  const validator = await validatorObject.safeParseAsync(body)
 
   if (!validator.success) {
     response.status(400)
-    response.json(validator.error.format())
+    response.json({
+      status: 'ERROR',
+      message: ErrorCodes['VAL-001'],
+      error: 'VAL-001',
+      data: {
+        issues: validator.error.issues,
+      },
+    })
     return
   }
+
+  const { data } = validator
 
   const count = await prisma.account.count({
     where: {
@@ -69,7 +85,11 @@ accountsRouter.post('/accounts', async ({ body: data }, response) => {
 
   if (count) {
     response.status(409)
-    response.json({ message: 'Email is already registered' })
+    response.json({
+      status: 'ERROR',
+      message: ErrorCodes['ACC-001'],
+      error: 'ACC-001',
+    })
     return
   }
 
@@ -83,25 +103,26 @@ accountsRouter.post('/accounts', async ({ body: data }, response) => {
     subject: `${projectName} - Please Verify Your Email Address`,
     to: data.email,
     html: `
-    <div>
-      <h1>${projectName}</h1>
-      <p>Thank you for registering!</p>
-      <p>To complete your registration, please verify your email by clicking <a href="${domain}/accounts?verificationToken=${token}">here</a>.</p>
-    </div>
-    `,
+      <div>
+        <h1>${projectName}</h1>
+        <p>Thank you for registering!</p>
+        <p>To complete your registration, please verify your email by clicking <a href="${domain}/accounts?verificationToken=${token}">here</a>.</p>
+      </div>
+      `,
   })
 
   if (result.rejected.length) {
     console.log(result)
     response.status(500)
     response.json({
-      message: 'Account creation failed: Email could not be sent',
+      status: 'ERROR',
+      message: ErrorCodes['ACC-002'],
+      error: 'ACC-002',
     })
     return
   }
 
-  const secret = Buffer.from(process.env.PEPPER_SECRET, 'utf-8')
-  data.password = await argon2.hash(data.password, { secret })
+  data.password = await generateSecurePassword(data.password)
 
   const account = await prisma.account.create({ data: data })
 
@@ -113,7 +134,10 @@ accountsRouter.post('/accounts', async ({ body: data }, response) => {
     },
   })
 
-  response.json({ account })
-})
-
-export default accountsRouter
+  response.json({
+    status: 'SUCCESS',
+    data: {
+      account,
+    },
+  })
+}
