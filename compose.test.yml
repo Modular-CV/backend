@@ -1,7 +1,7 @@
 version: '3.9'
 
 services:
-  database:
+  database_test:
     image: postgres
     restart: always
     # set shared memory limit when using docker-compose
@@ -13,7 +13,7 @@ services:
     #    tmpfs:
     #      size: 134217728 # 128*2^20 bytes = 128Mb
     networks:
-      - network
+      - network_test
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
@@ -21,14 +21,6 @@ services:
     ports:
       - $DATABASE_PORT:5432
 
-  adminer:
-    image: adminer
-    restart: always
-    environment:
-      ADMINER_DEFAULT_SERVER: database
-    ports:
-      - $ADMINER_PORT:8080
-
 networks:
-  network:
+  network_test:
     driver: bridge

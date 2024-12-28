@@ -23,5 +23,6 @@ tests/coverage
 
 # Environment files
 .env*
-# Allow development
-!.env.development
+# Allow dev and test
+!.env.dev
+!.env.test

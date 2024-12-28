@@ -67,6 +67,5 @@ This is the backend for a curriculum builder project: a modular and free-to-use 
 1. Clone this repository using git
 2. In your terminal:
    1. `yarn install`
-   2. `yarn compose:up`
    3. `yarn dev`
    4. Done!🫖

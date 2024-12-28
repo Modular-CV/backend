@@ -5,19 +5,28 @@
     "yarn": ">= 4"
   },
   "scripts": {
-    "compose:start": "docker compose start",
-    "compose:up": "docker compose up --detach",
-    "compose:down": "docker compose down",
-    "dev": "yarn dev:db; yarn migrate:reset; nodemon --watch src --ext ts",
-    "dev:db": "yarn compose:start; echo '\n🙀 Postgres Adminer: http://localhost:49300 🙀\n😼 Postgres Port: 5432 😼\n'",
+    "compose": "docker --log-level ERROR compose",
+    "compose:down": "yarn compose down",
+    "compose:down:test": "yarn compose --file compose.test.yml down",
+    "compose:kill": "yarn compose kill && echo ",
+    "compose:start": "yarn compose start",
+    "compose:start:test": "yarn compose --file compose.test.yml start",
+    "compose:stop": "yarn compose stop",
+    "compose:up": "yarn compose up --detach",
+    "compose:up:test": "yarn compose --file compose.test.yml up --detach",
+    "dev": "dotenv -e .env.dev -o -- yarn dev:start",
+    "dev:start": "echo \n$NODE_ENV environment set\n && yarn dev:start:db && yarn migrate:dev && nodemon --watch src --ext ts; yarn compose:stop",
+    "dev:start:db": "yarn compose:up && yarn compose:start && wait-on tcp:$DATABASE_PORT && echo \n🙀 Postgres Adminer: http://localhost:$ADMINER_PORT 🙀\n😼 Postgres Port: $DATABASE_PORT 😼\n",
     "format": "prettier . --write --log-level error",
-    "lint": "tsc --noemit; eslint; ",
+    "lint": "tsc --noemit & eslint",
     "migrate:dev": "prisma migrate dev",
     "migrate:prod": "prisma migrate deploy",
     "migrate:reset": "prisma migrate reset",
     "prepare": "husky",
     "start": "tsx src/server.ts",
-    "test": "yarn migrate:reset --force; jest --detectOpenHandles"
+    "test": "dotenv -e .env.test -o -- yarn test:start",
+    "test:start": "echo \n$NODE_ENV environment set\n && yarn test:start:db && yarn migrate:dev && jest --openHandlesTimeout; yarn compose:down:test",
+    "test:start:db": "yarn compose:up:test && yarn compose:start:test && wait-on tcp:$DATABASE_PORT && echo \n😼 Postgres Port: $DATABASE_PORT 😼\n"
   },
   "packageManager": "yarn@4.5.2",
   "dependencies": {
@@ -43,6 +52,7 @@
     "@types/nodemailer": "^6",
     "@types/supertest": "^6.0.2",
     "babel-jest": "^29.7.0",
+    "dotenv-cli": "^8.0.0",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.14.0",
@@ -53,6 +63,7 @@
     "supertest": "^7.0.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
-    "typescript-eslint": "^8.18.1"
+    "typescript-eslint": "^8.18.1",
+    "wait-on": "^8.0.1"
   }
 }

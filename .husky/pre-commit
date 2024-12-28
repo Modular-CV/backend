@@ -1,4 +1,4 @@
-echo "Running ESLint ✌️"
+echo Running ESLint ✌️
 yarn lint
-echo "Running Prettier 😼"
+echo Running Prettier 😼
 yarn format

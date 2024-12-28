@@ -13,17 +13,20 @@ declare global {
 
   namespace NodeJS {
     interface ProcessEnv {
+      ADMINER_PORT: string | number
+      DATABASE_NAME: string
+      DATABASE_PORT: string | number
+      DATABASE_URL: string
       DOMAIN: string
       NODE_ENV: 'development' | 'production'
-      NODE_MAILER_SERVICE: string
-      NODE_MAILER_USER: string
       NODE_MAILER_PASS: string
       NODE_MAILER_SENDER: string
+      NODE_MAILER_SERVICE: string
+      NODE_MAILER_USER: string
       PEPPER_SECRET: string
-      PORT: string
+      PORT: string | number
       PROJECT_NAME: string
       TOKEN_SECRET: string
-      DATABASE_URL: string
     }
   }
 
