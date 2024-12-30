@@ -4,18 +4,30 @@ import {
   rootController,
   sessionController,
 } from './controllers'
-import { authenticateSessionToken } from './middlewares'
+import { authenticateSessionToken as authenticateSession } from './middlewares'
+
+export const enum Routes {
+  root = '/',
+  myAccount = '/accounts/my',
+  accounts = '/accounts',
+  verifyAccount = '/accounts/verify/:token',
+  mySession = '/sessions/my',
+  sessions = '/sessions',
+  refreshMySession = '/sessions/my/refresh',
+}
 
 export const rootRouter = express.Router()
 
-rootRouter.get('/', rootController.get)
+rootRouter.get(Routes.root, rootController.get)
 
 export const accountsRouter = express.Router()
 
-accountsRouter.get('/accounts', accountController.get)
-accountsRouter.post('/accounts', accountController.post)
+accountsRouter.get(Routes.myAccount, authenticateSession, accountController.get)
+accountsRouter.post(Routes.verifyAccount, accountController.verify)
+accountsRouter.post(Routes.accounts, accountController.post)
 
 export const sessionsRouter = express.Router()
 
-sessionsRouter.get('/sessions', authenticateSessionToken)
-sessionsRouter.post('/sessions', sessionController.post)
+sessionsRouter.get(Routes.mySession, authenticateSession, sessionController.get)
+sessionsRouter.post(Routes.refreshMySession, sessionController.refresh)
+sessionsRouter.post(Routes.sessions, sessionController.post)

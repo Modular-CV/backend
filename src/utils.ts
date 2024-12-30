@@ -4,25 +4,40 @@ import { MailOptions } from 'nodemailer/lib/sendmail-transport'
 import argon2 from 'argon2'
 import SMTPTransport from 'nodemailer/lib/smtp-transport'
 
-export const generateSecurePassword = async (password: string) => {
+export const hashString = async (string: string) => {
   const secret = Buffer.from(process.env.PEPPER_SECRET, 'utf-8')
-  return await argon2.hash(password, { secret })
+  return await argon2.hash(string, { secret })
 }
 
-export const verifySecurePassword = async (
-  digest: string,
-  password: string,
+export const verifyHashedString = async (digest: string, string: string) => {
+  const secret = Buffer.from(process.env.PEPPER_SECRET, 'utf-8')
+  return await argon2.verify(digest, string, { secret })
+}
+
+export const generateSessionToken = (
+  { id, email }: RequestAccount,
+  type: 'access' | 'refresh',
 ) => {
-  const secret = Buffer.from(process.env.PEPPER_SECRET, 'utf-8')
-  return await argon2.verify(digest, password, { secret })
-}
+  const account = { id, email }
 
-export const generateSessionToken = (userName: string) => {
-  const tokenSecret = process.env.TOKEN_SECRET
+  switch (type) {
+    case 'access': {
+      const tokenSecret = process.env.ACCESS_TOKEN_SECRET
+      const expiresIn = Number(process.env.ACCESS_TOKEN_MAX_AGE) / 1000
 
-  if (!tokenSecret) throw new Error('Token secret is not defined')
+      if (!tokenSecret) throw new Error('ACCESS_TOKEN_SECRET is not defined')
 
-  return jwt.sign({ userName }, tokenSecret)
+      return jwt.sign({ account }, tokenSecret, { expiresIn })
+    }
+    case 'refresh': {
+      const tokenSecret = process.env.REFRESH_TOKEN_SECRET
+      const expiresIn = Number(process.env.REFRESH_TOKEN_MAX_AGE) / 1000
+
+      if (!tokenSecret) throw new Error('REFRESH_TOKEN_SECRET is not defined')
+
+      return jwt.sign({ account }, tokenSecret, { expiresIn })
+    }
+  }
 }
 
 export const sendMail = async (mailOptions: MailOptions) => {

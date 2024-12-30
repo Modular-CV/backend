@@ -6,54 +6,55 @@ export const authenticateSessionToken: RequestHandler = (
   response,
   next,
 ) => {
-  if (!process.env.TOKEN_SECRET) throw new Error('token secret is not defined')
+  if (!process.env.ACCESS_TOKEN_SECRET)
+    throw new Error('token secret is not defined')
 
-  const authHeader = request.headers.authorization
+  const cookies = request.cookies
+  const accessToken: string = cookies['accessToken']
 
-  if (!authHeader) {
+  if (!accessToken) {
     response.status(400).json({
       status: 'ERROR',
-      error: 'AUTH-001',
       message: ErrorCodes['AUTH-001'],
+      error: 'AUTH-001',
     })
     return
   }
 
-  const token = authHeader && authHeader.split(' ')[1]
-
-  if (!token) {
-    response.status(400).json({
-      status: 'ERROR',
-      error: 'AUTH-002',
-      message: ErrorCodes['AUTH-002'],
-    })
-    return
-  }
-
-  jwt.verify(token, process.env.TOKEN_SECRET, (error, user) => {
+  jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (error, payload) => {
     if (error) {
       switch (error.message) {
         case 'invalid token': {
-          response.status(403).json({
+          response.status(401).json({
             status: 'ERROR',
-            error: 'AUTH-003',
-            message: ErrorCodes['AUTH-003'],
+            message: ErrorCodes['AUTH-002'],
+            error: 'AUTH-002',
           })
-          break
+          return
+        }
+        case 'jwt expired': {
+          response.status(401).json({
+            status: 'ERROR',
+            message: ErrorCodes['AUTH-005'],
+            error: 'AUTH-005',
+          })
+          return
         }
         default: {
-          response.status(403).json({
+          response.status(401).json({
             status: 'ERROR',
-            error: 'AUTH-003',
-            message: ErrorCodes['AUTH-003'],
+            data: {
+              details: error.message,
+            },
+            message: ErrorCodes['AUTH-002'],
+            error: 'AUTH-002',
           })
-          break
+          return
         }
       }
-      return
     }
 
-    request.user = user
+    if (typeof payload === 'object') request.accessToken = payload
 
     next()
   })

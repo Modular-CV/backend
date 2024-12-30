@@ -1,57 +1,66 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '.'
-import { generateSecurePassword, sendMail } from '../utils'
+import { hashString, sendMail } from '../utils'
 import { z } from 'zod'
 import { ErrorCodes } from '../types'
 
-export const get: RequestHandler = async ({ query }, response) => {
-  const verificationTokenQuery =
-    typeof query.verificationToken === 'string'
-      ? query.verificationToken
-      : undefined
+export const verify: RequestHandler = async ({ params }, response) => {
+  const verificationTokenQuery = params.token
 
-  if (verificationTokenQuery) {
-    const verificationToken = await prisma.verificationToken.findUnique({
-      where: { token: verificationTokenQuery },
-    })
+  const verificationToken = await prisma.verificationToken.findUnique({
+    where: { token: verificationTokenQuery },
+  })
 
-    const isInvalidValidToken =
-      !verificationToken ||
-      new Date().getTime() >= new Date(verificationToken.expiresAt).getTime() ||
-      verificationToken.isUsed
+  const isInvalidValidToken =
+    !verificationToken ||
+    new Date().getTime() >= new Date(verificationToken.expiresAt).getTime() ||
+    verificationToken.isUsed
 
-    if (isInvalidValidToken) {
-      response.status(400)
-      response.json({
-        status: 'ERROR',
-        message: ErrorCodes['VER-001'],
-        error: 'VER-001',
-      })
-      return
-    }
-
-    await prisma.verificationToken.update({
-      where: {
-        id: verificationToken.id,
-      },
-      data: {
-        isUsed: true,
-        account: {
-          update: {
-            isVerified: true,
-          },
-        },
-      },
-    })
-
+  if (isInvalidValidToken) {
+    response.status(400)
     response.json({
-      status: 'SUCCESS',
-      message: 'Email validation successful',
+      status: 'ERROR',
+      message: ErrorCodes['VER-001'],
+      error: 'VER-001',
     })
     return
   }
 
-  response.json()
+  await prisma.verificationToken.update({
+    where: {
+      id: verificationToken.id,
+    },
+    data: {
+      isUsed: true,
+      account: {
+        update: {
+          isVerified: true,
+        },
+      },
+    },
+  })
+
+  response.json({
+    status: 'SUCCESS',
+    message: 'Email validation successful',
+  })
+}
+
+export const get: RequestHandler = async ({ accessToken }, response) => {
+  if (!accessToken) return
+
+  const account = prisma.account.findUnique({
+    where: {
+      id: accessToken.account.id,
+    },
+  })
+
+  response.json({
+    status: 'SUCCESS',
+    data: {
+      account,
+    },
+  })
 }
 
 export const post: RequestHandler = async ({ body }, response) => {
@@ -60,7 +69,7 @@ export const post: RequestHandler = async ({ body }, response) => {
     password: z.string().min(4),
   }) satisfies z.Schema<Prisma.AccountCreateInput>
 
-  const validator = await validatorObject.safeParseAsync(body)
+  const validator = validatorObject.safeParse(body)
 
   if (!validator.success) {
     response.status(400)
@@ -106,13 +115,12 @@ export const post: RequestHandler = async ({ body }, response) => {
       <div>
         <h1>${projectName}</h1>
         <p>Thank you for registering!</p>
-        <p>To complete your registration, please verify your email by clicking <a href="${domain}/accounts?verificationToken=${token}">here</a>.</p>
+        <p>To complete your registration, please verify your email by clicking <a href="${domain}/accounts/verify/${token}">here</a>.</p>
       </div>
       `,
   })
 
   if (result.rejected.length) {
-    console.log(result)
     response.status(500)
     response.json({
       status: 'ERROR',
@@ -122,7 +130,7 @@ export const post: RequestHandler = async ({ body }, response) => {
     return
   }
 
-  data.password = await generateSecurePassword(data.password)
+  data.password = await hashString(data.password)
 
   const account = await prisma.account.create({ data: data })
 
