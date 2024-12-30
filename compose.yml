@@ -24,6 +24,8 @@ services:
   adminer:
     image: adminer
     restart: always
+    networks:
+      - network
     environment:
       ADMINER_DEFAULT_SERVER: database
     ports:
