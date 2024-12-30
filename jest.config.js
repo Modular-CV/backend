@@ -61,9 +61,10 @@ const config = {
 
   // A path to a module which exports an async function that is triggered once before all test suites
   // globalSetup: undefined,
+  globalSetup: './tests/setup.ts',
 
   // A path to a module which exports an async function that is triggered once after all test suites
-  // globalTeardown: undefined,
+  globalTeardown: './tests/teardown.ts',
 
   // A set of global variables that need to be available in all test environments
   // globals: {},
@@ -158,7 +159,7 @@ const config = {
   //   "**/__tests__/**/*.[jt]s?(x)",
   //   "**/?(*.)+(spec|test).[tj]s?(x)"
   // ],
-  testMatch: ['**/tests/**/*.ts'],
+  testMatch: ['**/tests/**/*.test.ts'],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   // testPathIgnorePatterns: [
