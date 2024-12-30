@@ -51,6 +51,7 @@ This is the backend for a curriculum builder project: a modular and free-to-use 
 - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) 🛠️
 - [GitHub Pull Requests](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-pull-request-github) 🔗
 - [GitLens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens) 🔍
+- [Jest](https://marketplace.visualstudio.com/items?itemName=Orta.vscode-jest) 🤡
 - [Postman](https://marketplace.visualstudio.com/items?itemName=Postman.postman-for-vscode) 📫
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) 🎨
 - [Prisma](https://marketplace.visualstudio.com/items?itemName=Prisma.prisma) 📊
@@ -67,5 +68,5 @@ This is the backend for a curriculum builder project: a modular and free-to-use 
 1. Clone this repository using git
 2. In your terminal:
    1. `yarn install`
-   3. `yarn dev`
-   4. Done!🫖
+   2. `yarn dev`
+   3. Done!🫖
