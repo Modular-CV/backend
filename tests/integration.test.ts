@@ -4,8 +4,9 @@ import supertest from 'supertest'
 import { createAccount, generateAccountInput, sleep } from './utils'
 import { Routes } from '../src/routes'
 import { prisma } from '../src/controllers'
+import { Prisma } from '@prisma/client'
 
-let request = supertest.agent(server)
+let request: SuperRequest = supertest.agent(server)
 
 // Sometimes, we want to start a test suite with a request.
 // In such cases, the request should be reset after each test suite, not before.
@@ -231,5 +232,35 @@ describe('GET ' + Routes.myResumes, () => {
     const response = await request.get(Routes.myResumes)
 
     expect(response.status).toBe(200)
+  })
+})
+
+describe('POST ' + Routes.resumes, () => {
+  beforeAll(async () => {
+    const account = generateAccountInput()
+    await createAccount(account)
+    await request.post(Routes.sessions).send(account)
+  })
+
+  test('should return status 200 and the resume with id', async () => {
+    const resumeInput = Prisma.validator(
+      prisma,
+      'resume',
+      'create',
+      'data',
+    )({
+      title: faker.book.title(),
+    })
+
+    const response = await request.post(Routes.resumes).send(resumeInput)
+
+    expect(response.status).toBe(200)
+
+    const {
+      data: { resume },
+    } = response.body
+
+    expect(resume.id).toBeTruthy()
+    expect(resume.title).toBe(resumeInput.title)
   })
 })
