@@ -1,9 +1,9 @@
 import server from '../src/server'
-import { Prisma } from '@prisma/client'
 import { faker } from '@faker-js/faker'
 import supertest from 'supertest'
 import { createAccount, generateAccountInput } from './utils'
 import { Routes } from '../src/routes'
+import { prisma } from '../src/controllers'
 
 let request: SuperRequest
 
@@ -23,19 +23,35 @@ describe('GET / ', () => {
 })
 
 describe('POST /accounts', () => {
-  it('should create an account, send email, return the account and omit the password', async () => {
-    const account: Prisma.AccountCreateInput = {
-      email: faker.internet.email(),
-      password: faker.internet.password(),
-    }
+  it('should not create an account if the same email already exists and should return status 409', async () => {
+    const account = generateAccountInput()
+
+    await createAccount(account)
 
     const response = await request.post(Routes.accounts).send(account)
+
+    expect(response.status).toBe(409)
+
+    const accountCount = await prisma.account.count({
+      where: {
+        email: account.email,
+      },
+    })
+
+    expect(accountCount).toBe(1)
+  })
+
+  it('should create an account, send email, return the account and omit the password', async () => {
+    const account = generateAccountInput()
+
+    const response = await request.post(Routes.accounts).send(account)
+
+    expect(response.status).toBe(200)
 
     const {
       data: { account: newAccount },
     } = response.body
 
-    expect(response.status).toBe(200)
     expect(newAccount.id).toBeTruthy()
     expect(newAccount.email).toBe(account.email)
     expect(newAccount.password).toBeFalsy()
