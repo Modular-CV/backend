@@ -120,7 +120,7 @@ export const refresh: RequestHandler = async ({ cookies }, response) => {
           return
         }
 
-        const isMatch = verifyHashedString(
+        const isMatch = await verifyHashedString(
           refreshTokenFound.tokenHash,
           refreshToken,
         )
