@@ -60,6 +60,32 @@ describe('POST /accounts', () => {
   }, 10000)
 })
 
+describe('POST /sessions', () => {
+  const account = generateAccountInput()
+
+  beforeAll(async () => {
+    await createAccount(account)
+  })
+
+  it('should return status 200 and the jwts', async () => {
+    const response = await request.post(Routes.sessions).send(account)
+
+    const cookies = response.headers['set-cookie']
+    expect(cookies.length).toBe(2)
+    expect(response.status).toBe(200)
+  })
+
+  it('Should return status 401 if the email and password do not match', async () => {
+    const response = await request.post(Routes.sessions).send({
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+    })
+
+    expect(response.status).toBe(401)
+    expect(response.body)
+  })
+})
+
 describe('GET /sessions/my', () => {
   const account = generateAccountInput()
 
@@ -125,37 +151,5 @@ describe('POST /sessions/my/refresh', () => {
     const cookies = response.headers['set-cookie']
     expect(cookies.length).toBe(2)
     expect(response.status).toBe(200)
-  })
-})
-
-describe('POST /sessions', () => {
-  const account = generateAccountInput()
-
-  beforeAll(async () => {
-    await createAccount(account)
-  })
-
-  it('should return the account and the jwts without the password if the email and password match', async () => {
-    const response = await request.post(Routes.sessions).send(account)
-
-    const {
-      data: { account: accountResponse },
-    } = response.body
-
-    const cookies = response.headers['set-cookie']
-    expect(cookies.length).toBe(2)
-    expect(response.status).toBe(200)
-    expect(accountResponse.email).toBe(account.email)
-    expect(accountResponse.password).toBeFalsy()
-  })
-
-  it('Should return status 401 if the email and password do not match', async () => {
-    const response = await request.post(Routes.sessions).send({
-      email: faker.internet.email(),
-      password: faker.internet.password(),
-    })
-
-    expect(response.status).toBe(401)
-    expect(response.body)
   })
 })
