@@ -54,7 +54,8 @@ export const authenticateSessionToken: RequestHandler = (
       }
     }
 
-    if (typeof payload === 'object') request.accessToken = payload
+    if (typeof payload === 'object')
+      request.accessToken = payload as CustomJwtPayload
 
     next()
   })

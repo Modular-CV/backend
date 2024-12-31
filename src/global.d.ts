@@ -36,7 +36,7 @@ declare global {
 
   namespace Express {
     interface Request {
-      accessToken?: CustomJwtPayload | JwtPayload
+      accessToken?: CustomJwtPayload
     }
   }
 
