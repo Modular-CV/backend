@@ -1,7 +1,7 @@
 import server from '../src/server'
 import { faker } from '@faker-js/faker'
 import supertest from 'supertest'
-import { createAccount, generateAccountInput } from './utils'
+import { createAccount, generateAccountInput, sleep } from './utils'
 import { Routes } from '../src/routes'
 import { prisma } from '../src/controllers'
 
@@ -75,7 +75,7 @@ describe('POST /sessions', () => {
     expect(response.status).toBe(200)
   })
 
-  it('Should return status 401 if the email and password do not match', async () => {
+  it('should return status 401 if the email and password do not match', async () => {
     const response = await request.post(Routes.sessions).send({
       email: faker.internet.email(),
       password: faker.internet.password(),
@@ -105,7 +105,8 @@ describe('GET /sessions/my', () => {
     process.env.ACCESS_TOKEN_MAX_AGE = seconds
 
     await request.post(Routes.sessions).send(account)
-    await new Promise((resolve) => setTimeout(resolve, seconds * 1.25))
+
+    await sleep(seconds * 1.25)
 
     const response = await request.get(Routes.mySession)
 
@@ -151,5 +152,68 @@ describe('POST /sessions/my/refresh', () => {
     const cookies = response.headers['set-cookie']
     expect(cookies.length).toBe(2)
     expect(response.status).toBe(200)
+  })
+
+  it('should get different tokens for each session refresh', async () => {
+    const sessionResponse = await request.post(Routes.sessions).send(account)
+    const sessionCookies = sessionResponse.headers['set-cookie']
+
+    await sleep(1000)
+
+    const firstRefreshResponse = await request.post(Routes.refreshMySession)
+    const firstRefreshResponseCookies =
+      firstRefreshResponse.headers['set-cookie']
+
+    await sleep(1000)
+
+    const secondRefreshResponse = await request.post(Routes.refreshMySession)
+    const secondRefreshResponseCookies =
+      secondRefreshResponse.headers['set-cookie']
+
+    const areTheyArray =
+      Array.isArray(sessionCookies) &&
+      Array.isArray(firstRefreshResponseCookies) &&
+      Array.isArray(secondRefreshResponseCookies)
+
+    const isAccessTokensEqual = (cookiesA: string[], cookiesB: string[]) =>
+      cookiesA.find((cookie: string) => cookie.startsWith('access')) ===
+      cookiesB.find((cookie: string) => cookie.startsWith('access'))
+
+    if (areTheyArray) {
+      expect(
+        isAccessTokensEqual(sessionCookies, firstRefreshResponseCookies),
+      ).toBeFalsy()
+
+      expect(
+        isAccessTokensEqual(
+          firstRefreshResponseCookies,
+          secondRefreshResponseCookies,
+        ),
+      ).toBeFalsy()
+    }
+  })
+
+  it('should return 401 if the user tries to use an old refresh token', async () => {
+    const sessionResponse = await request.post(Routes.sessions).send(account)
+    const cookies = sessionResponse.headers['set-cookie']
+    let oldRefreshToken = ''
+
+    if (Array.isArray(cookies)) {
+      oldRefreshToken = cookies.find((cookie: string) =>
+        cookie.startsWith('refresh'),
+      )
+    }
+
+    await sleep(1000)
+
+    await request.post(Routes.refreshMySession)
+
+    const newRequest = supertest.agent(server)
+
+    const refreshResponse = await newRequest
+      .post(Routes.refreshMySession)
+      .set('Cookie', oldRefreshToken)
+
+    expect(refreshResponse.status).toBe(401)
   })
 })

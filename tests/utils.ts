@@ -25,3 +25,10 @@ export const createAccount = async (account: Prisma.AccountCreateInput) => {
     },
   })
 }
+
+/**
+ * Used across multiple requests, typically to generate unique JWTs.
+ */
+
+export const sleep = (timeout: number) =>
+  new Promise((resolve) => setTimeout(resolve, timeout))
