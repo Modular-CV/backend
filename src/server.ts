@@ -1,5 +1,5 @@
 import express from 'express'
-import { rootRouter, accountsRouter, sessionsRouter } from './routes'
+import * as routes from './routes'
 import cookieParser from 'cookie-parser'
 
 const server = express()
@@ -7,9 +7,10 @@ const server = express()
 server.use(express.json())
 server.use(cookieParser())
 
-server.use(accountsRouter)
-server.use(rootRouter)
-server.use(sessionsRouter)
+server.use(routes.rootRouter)
+server.use(routes.accountsRouter)
+server.use(routes.sessionsRouter)
+server.use(routes.resumeRouter)
 
 const serverListenMessage = () => {
   console.log(`\nServer is running on ${process.env.DOMAIN}\n`)

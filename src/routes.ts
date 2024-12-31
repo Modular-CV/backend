@@ -3,6 +3,7 @@ import {
   accountController,
   rootController,
   sessionController,
+  resumeController,
 } from './controllers'
 import { authenticateSessionToken as authenticateSession } from './middlewares'
 
@@ -14,6 +15,7 @@ export const enum Routes {
   mySession = '/sessions/my',
   sessions = '/sessions',
   refreshMySession = '/sessions/my/refresh',
+  myResumes = '/my/resumes',
 }
 
 export const rootRouter = express.Router()
@@ -31,3 +33,7 @@ export const sessionsRouter = express.Router()
 sessionsRouter.get(Routes.mySession, authenticateSession, sessionController.get)
 sessionsRouter.post(Routes.refreshMySession, sessionController.refresh)
 sessionsRouter.post(Routes.sessions, sessionController.post)
+
+export const resumeRouter = express.Router()
+
+resumeRouter.get(Routes.myResumes, authenticateSession, resumeController.get)

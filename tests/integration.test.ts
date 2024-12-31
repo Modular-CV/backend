@@ -5,9 +5,11 @@ import { createAccount, generateAccountInput, sleep } from './utils'
 import { Routes } from '../src/routes'
 import { prisma } from '../src/controllers'
 
-let request: SuperRequest
+let request = supertest.agent(server)
 
-beforeEach(() => {
+// Sometimes, we want to start a test suite with a request.
+// In such cases, the request should be reset after each test suite, not before.
+afterEach(() => {
   request = supertest.agent(server)
 })
 
@@ -15,15 +17,15 @@ afterAll(() => {
   server.close()
 })
 
-describe('GET / ', () => {
-  it('should return status 200', async () => {
+describe('GET ' + Routes.root, () => {
+  test('should return status 200', async () => {
     const response = await request.get(Routes.root)
     expect(response.status).toBe(200)
   })
 })
 
-describe('POST /accounts', () => {
-  it('should not create an account if the same email already exists and should return status 409', async () => {
+describe('POST ' + Routes.accounts, () => {
+  test('should not create an account if the same email already exists and should return status 409', async () => {
     const account = generateAccountInput()
 
     await createAccount(account)
@@ -41,7 +43,7 @@ describe('POST /accounts', () => {
     expect(accountCount).toBe(1)
   })
 
-  it('should create an account, send email, return the account and omit the password', async () => {
+  test('should create an account, send email, return the account and omit the password', async () => {
     const account = generateAccountInput()
 
     const response = await request.post(Routes.accounts).send(account)
@@ -60,14 +62,14 @@ describe('POST /accounts', () => {
   }, 10000)
 })
 
-describe('POST /sessions', () => {
+describe('POST ' + Routes.sessions, () => {
   const account = generateAccountInput()
 
   beforeAll(async () => {
     await createAccount(account)
   })
 
-  it('should return status 200 and the jwts', async () => {
+  test('should return status 200 and the jwts', async () => {
     const response = await request.post(Routes.sessions).send(account)
 
     const cookies = response.headers['set-cookie']
@@ -75,7 +77,7 @@ describe('POST /sessions', () => {
     expect(response.status).toBe(200)
   })
 
-  it('should return status 401 if the email and password do not match', async () => {
+  test('should return status 401 if the email and password do not match', async () => {
     const response = await request.post(Routes.sessions).send({
       email: faker.internet.email(),
       password: faker.internet.password(),
@@ -86,19 +88,19 @@ describe('POST /sessions', () => {
   })
 })
 
-describe('GET /sessions/my', () => {
+describe('GET ' + Routes.mySession, () => {
   const account = generateAccountInput()
 
   beforeAll(async () => {
     await createAccount(account)
   })
 
-  it('should return status 400 if there is no access cookie', async () => {
+  test('should return status 400 if there is no access cookie', async () => {
     const response = await request.get(Routes.mySession)
     expect(response.status).toBe(400)
   })
 
-  it('the expired cookie should be deleted from the browser. status should be 400', async () => {
+  test('the expired cookie should be deleted from the browser. status should be 400', async () => {
     const originalAccessTokenMaxAge = process.env.ACCESS_TOKEN_MAX_AGE
     const seconds = 2 * 1000
 
@@ -115,7 +117,7 @@ describe('GET /sessions/my', () => {
     process.env.ACCESS_TOKEN_MAX_AGE = originalAccessTokenMaxAge
   })
 
-  it('should return 200 and the account if the token is valid and the account should not contain the password', async () => {
+  test('should return 200 and the account if the token is valid and the account should not contain the password', async () => {
     await request.post(Routes.sessions).send(account)
     const response = await request.get(Routes.mySession)
 
@@ -132,20 +134,20 @@ describe('GET /sessions/my', () => {
   })
 })
 
-describe('POST /sessions/my/refresh', () => {
+describe('POST ' + Routes.refreshMySession, () => {
   const account = generateAccountInput()
 
   beforeAll(async () => {
     await createAccount(account)
   })
 
-  it('should return 400 when there is no refresh token', async () => {
+  test('should return 400 when there is no refresh token', async () => {
     const response = await request.post(Routes.refreshMySession)
 
     expect(response.status).toBe(400)
   })
 
-  it('Should return 200 and return the new tokens when a refresh token is used to request a new token', async () => {
+  test('Should return 200 and return the new tokens when a refresh token is used to request a new token', async () => {
     await request.post(Routes.sessions).send(account)
     const response = await request.post(Routes.refreshMySession)
 
@@ -154,7 +156,7 @@ describe('POST /sessions/my/refresh', () => {
     expect(response.status).toBe(200)
   })
 
-  it('should get different tokens for each session refresh', async () => {
+  test('should get different tokens for each session refresh', async () => {
     const sessionResponse = await request.post(Routes.sessions).send(account)
     const sessionCookies = sessionResponse.headers['set-cookie']
 
@@ -193,7 +195,7 @@ describe('POST /sessions/my/refresh', () => {
     }
   })
 
-  it('should return 401 if the user tries to use an old refresh token', async () => {
+  test('should return 401 if the user tries to use an old refresh token', async () => {
     const sessionResponse = await request.post(Routes.sessions).send(account)
     const cookies = sessionResponse.headers['set-cookie']
     let oldRefreshToken = ''
@@ -215,5 +217,19 @@ describe('POST /sessions/my/refresh', () => {
       .set('Cookie', oldRefreshToken)
 
     expect(refreshResponse.status).toBe(401)
+  })
+})
+
+describe('GET ' + Routes.myResumes, () => {
+  beforeAll(async () => {
+    const account = generateAccountInput()
+    await createAccount(account)
+    await request.post(Routes.sessions).send(account)
+  })
+
+  test('should return status 200', async () => {
+    const response = await request.get(Routes.myResumes)
+
+    expect(response.status).toBe(200)
   })
 })
