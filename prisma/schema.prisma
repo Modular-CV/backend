@@ -19,10 +19,11 @@ model Account {
   email             String             @unique
   password          String
   isVerified        Boolean            @default(false)
-  createdAt         DateTime           @default(now()) @map("created_at")
-  updatedAt         DateTime           @updatedAt @map("updated_at")
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
   verificationToken VerificationToken?
   refreshToken      RefreshToken?
+  Resume            Resume[]
 }
 
 model VerificationToken {
@@ -42,4 +43,13 @@ model RefreshToken {
   tokenHash String
   createdAt DateTime @default(now())
   expiresAt DateTime
+}
+
+model Resume {
+  id        String   @id @default(cuid())
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId String
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
