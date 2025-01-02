@@ -9,12 +9,27 @@ import TestAgent from 'supertest/lib/agent'
 import { Test } from 'supertest'
 
 declare global {
+  type ParsedRoute = string & { __brand: 'ParsedRoute' }
+
+  type ExtractParams<T extends string> =
+    T extends `/${string}/:${infer Param}/${infer Rest}`
+      ? `:${Param}` | ExtractParams<`/${Rest}`>
+      : T extends `/${string}/:${infer Param}`
+        ? `:${Param}`
+        : never
+
+  type RouteParser = <T extends Routes>(
+    route: T,
+    param: ExtractParams<T>,
+    replace: string,
+  ) => ParsedRoute
+
   type RequestAccount = Pick<Account, 'id' | 'email'>
 
   type CustomJwtPayload = { account: RequestAccount } & JwtPayload
 
   type SuperRequest = Omit<TestAgent, 'post' | 'get'> &
-    Record<'post' | 'get', (route: Routes) => Test>
+    Record<'post' | 'get', (route: Routes | ParsedRoute) => Test>
 
   type ResponseBody<ErrorCode = keyof typeof ErrorCodes | undefined> =
     ErrorCode extends undefined

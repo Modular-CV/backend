@@ -1,8 +1,9 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '.'
-import { hashString, sendMail } from '../utils'
+import { hashString, routeParser, sendMail } from '../utils'
 import { z } from 'zod'
 import { ErrorCodes } from '../types'
+import { Routes } from '../routes'
 
 export const verify: RequestHandler = async ({ params }, response) => {
   const verificationTokenQuery = params.token
@@ -115,7 +116,7 @@ export const post: RequestHandler = async ({ body }, response) => {
       <div>
         <h1>${projectName}</h1>
         <p>Thank you for registering!</p>
-        <p>To complete your registration, please verify your email by clicking <a href="${domain}/accounts/verify/${token}">here</a>.</p>
+        <p>To complete your registration, please verify your email by clicking <a href="${domain}${routeParser(Routes.verifyAccount, ':token', token)}">here</a>.</p>
       </div>
       `,
   })
