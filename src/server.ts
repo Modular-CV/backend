@@ -12,8 +12,4 @@ server.use(routes.accountsRouter)
 server.use(routes.sessionsRouter)
 server.use(routes.resumeRouter)
 
-const serverListenMessage = () => {
-  console.log(`\nServer is running on ${process.env.DOMAIN}\n`)
-}
-
-export default server.listen(process.env.PORT, serverListenMessage)
+export default server

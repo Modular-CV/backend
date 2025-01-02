@@ -29,7 +29,7 @@
     "migrate:prod": "yarn echo:database:url && prisma migrate deploy",
     "migrate:reset": "yarn echo:database:url && prisma migrate reset",
     "prepare": "husky",
-    "start": "tsx src/server.ts",
+    "start": "tsx src",
     "test": "dotenv -e .env.test -o -- yarn test:start",
     "test:compose:down": "yarn compose --file compose.test.yml down",
     "test:compose:start": "yarn compose --file compose.test.yml start",
