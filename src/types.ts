@@ -8,6 +8,7 @@ export enum ErrorCodes {
   'AUTH-007' = 'Refresh token is invalid',
   'AUTH-008' = 'Refresh token expired',
   'VAL-001' = 'Request body is missing required fields or is invalid',
+  'VAL-002' = 'The requested resource does not exist',
   'ACC-001' = 'Email is already registered',
   'ACC-002' = 'Email could not be sent',
   'VER-001' = 'Verification token is invalid, expired or used',

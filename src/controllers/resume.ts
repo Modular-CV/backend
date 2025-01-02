@@ -54,3 +54,29 @@ export const post: RequestHandler = async ({ accessToken, body }, response) => {
     },
   })
 }
+
+export const getById: RequestHandler = async ({ params }, response) => {
+  const resumeId = params.resumeId
+
+  const resume = await prisma.resume.findUnique({
+    where: {
+      id: resumeId,
+    },
+  })
+
+  if (!resume) {
+    response.status(404).json({
+      status: 'ERROR',
+      message: ErrorCodes['VAL-002'],
+      error: 'VAL-002',
+    })
+    return
+  }
+
+  response.json({
+    status: 'SUCCESS',
+    data: {
+      resume,
+    },
+  })
+}

@@ -16,6 +16,7 @@ export const enum Routes {
   sessions = '/sessions',
   refreshMySession = '/sessions/my/refresh',
   myResumes = '/my/resumes',
+  myResumeById = '/my/resumes/:resumeId',
   resumes = '/resumes',
 }
 
@@ -38,4 +39,9 @@ sessionsRouter.post(Routes.sessions, sessionController.post)
 export const resumeRouter = express.Router()
 
 resumeRouter.get(Routes.myResumes, authenticateSession, resumeController.get)
+resumeRouter.get(
+  Routes.myResumeById,
+  authenticateSession,
+  resumeController.getById,
+)
 resumeRouter.post(Routes.resumes, authenticateSession, resumeController.post)
