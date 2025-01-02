@@ -17,6 +17,19 @@ export const generateAccountInput = () => {
   return account
 }
 
+export const generateResumeInput = () => {
+  const resume = Prisma.validator(
+    prisma,
+    'resume',
+    'create',
+    'data',
+  )({
+    title: faker.book.title(),
+  })
+
+  return resume
+}
+
 export const createAccount = async (account: Prisma.AccountCreateInput) => {
   return await prisma.account.create({
     data: {
@@ -29,6 +42,5 @@ export const createAccount = async (account: Prisma.AccountCreateInput) => {
 /**
  * Used across multiple requests, typically to generate unique JWTs.
  */
-
 export const sleep = (timeout: number) =>
   new Promise((resolve) => setTimeout(resolve, timeout))

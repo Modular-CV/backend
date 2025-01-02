@@ -1,66 +1,18 @@
-import server from '../src/server'
-import { faker } from '@faker-js/faker'
+import { faker } from '@faker-js/faker/.'
 import supertest from 'supertest'
-import { createAccount, generateAccountInput, sleep } from './utils'
-import { Routes } from '../src/routes'
-import { prisma } from '../src/controllers'
-import { Prisma } from '@prisma/client'
+import { Routes } from '../../src/routes'
+import { generateAccountInput, createAccount, sleep } from '../utils'
+import server from '../../src/server'
 
-let request: SuperRequest = supertest.agent(server)
-
-// Sometimes, we want to start a test suite with a request.
-// In such cases, the request should be reset after each test suite, not before.
-afterEach(() => {
-  request = supertest.agent(server)
-})
+const serverInstance = server.listen()
+let request = supertest.agent(serverInstance)
 
 afterAll(() => {
-  server.close()
+  serverInstance.close()
 })
 
-describe('GET ' + Routes.root, () => {
-  test('should return status 200', async () => {
-    const response = await request.get(Routes.root)
-    expect(response.status).toBe(200)
-  })
-})
-
-describe('POST ' + Routes.accounts, () => {
-  test('should not create an account if the same email already exists and should return status 409', async () => {
-    const account = generateAccountInput()
-
-    await createAccount(account)
-
-    const response = await request.post(Routes.accounts).send(account)
-
-    expect(response.status).toBe(409)
-
-    const accountCount = await prisma.account.count({
-      where: {
-        email: account.email,
-      },
-    })
-
-    expect(accountCount).toBe(1)
-  })
-
-  test('should create an account, send email, return the account and omit the password', async () => {
-    const account = generateAccountInput()
-
-    const response = await request.post(Routes.accounts).send(account)
-
-    expect(response.status).toBe(200)
-
-    const {
-      data: { account: newAccount },
-    } = response.body
-
-    expect(newAccount.id).toBeTruthy()
-    expect(newAccount.email).toBe(account.email)
-    expect(newAccount.password).toBeFalsy()
-
-    // Wait for nodemailer to finish
-  }, 10000)
+afterEach(() => {
+  request = supertest.agent(serverInstance)
 })
 
 describe('POST ' + Routes.sessions, () => {
@@ -211,56 +163,12 @@ describe('POST ' + Routes.refreshMySession, () => {
 
     await request.post(Routes.refreshMySession)
 
-    const newRequest = supertest.agent(server)
+    const newRequest = supertest.agent(serverInstance)
 
     const refreshResponse = await newRequest
       .post(Routes.refreshMySession)
       .set('Cookie', oldRefreshToken)
 
     expect(refreshResponse.status).toBe(401)
-  })
-})
-
-describe('GET ' + Routes.myResumes, () => {
-  beforeAll(async () => {
-    const account = generateAccountInput()
-    await createAccount(account)
-    await request.post(Routes.sessions).send(account)
-  })
-
-  test('should return status 200', async () => {
-    const response = await request.get(Routes.myResumes)
-
-    expect(response.status).toBe(200)
-  })
-})
-
-describe('POST ' + Routes.resumes, () => {
-  beforeAll(async () => {
-    const account = generateAccountInput()
-    await createAccount(account)
-    await request.post(Routes.sessions).send(account)
-  })
-
-  test('should return status 200 and the resume with id', async () => {
-    const resumeInput = Prisma.validator(
-      prisma,
-      'resume',
-      'create',
-      'data',
-    )({
-      title: faker.book.title(),
-    })
-
-    const response = await request.post(Routes.resumes).send(resumeInput)
-
-    expect(response.status).toBe(200)
-
-    const {
-      data: { resume },
-    } = response.body
-
-    expect(resume.id).toBeTruthy()
-    expect(resume.title).toBe(resumeInput.title)
   })
 })
