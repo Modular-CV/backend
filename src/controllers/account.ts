@@ -33,7 +33,7 @@ export const verify: RequestHandler = async ({ params }, response) => {
     },
     data: {
       isUsed: true,
-      account: {
+      Account: {
         update: {
           isVerified: true,
         },
