@@ -25,6 +25,9 @@ model Account {
   VerificationToken VerificationToken?
   RefreshToken      RefreshToken?
   Resume            Resume[]
+  Section           Section[]
+  Profile           Profile[]
+  Link              Link[]
 }
 
 model VerificationToken {
@@ -51,9 +54,222 @@ model RefreshToken {
 model Resume {
   id        String   @id @default(cuid())
   accountId String
+  profileId String?
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Account Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  Profile Profile? @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  ResumeSection ResumeSection[]
+}
+
+model ResumeSection {
+  id           String @id @default(cuid())
+  resumeId     String
+  sectionId    String
+  sectionOrder Int
+
+  Resume  Resume  @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  Section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@unique([resumeId, sectionOrder])
+}
+
+model Section {
+  id        String   @id @default(cuid())
+  accountId String
   title     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   Account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  ResumeSection ResumeSection[]
+  Entry         Entry?
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  accountId String
+  fullName  String
+  jobTitle  String?
+  email     String?
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Account Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  Resume  Resume[]
+}
+
+model Link {
+  id        String @id @default(cuid())
+  accountId String
+  url       String
+
+  Account                     Account                       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  EducationEntry              EducationEntry[]
+  ProfessionalExperienceEntry ProfessionalExperienceEntry[]
+  ProjectEntry                ProjectEntry[]
+  CourseEntry                 CourseEntry[]
+  CustomEntry                 CustomEntry[]
+}
+
+model Entry {
+  id        String  @id @default(cuid())
+  sectionId String  @unique
+  isVisible Boolean @default(true)
+
+  Section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  EducationEntry              EducationEntry?
+  ProfessionalExperienceEntry ProfessionalExperienceEntry?
+  SkillEntry                  SkillEntry?
+  ProjectEntry                ProjectEntry?
+  CourseEntry                 CourseEntry?
+  CustomEntry                 CustomEntry?
+}
+
+model EntryLocation {
+  id      String  @id @default(cuid())
+  city    String?
+  country String?
+
+  EducationEntry              EducationEntry?
+  ProfessionalExperienceEntry ProfessionalExperienceEntry?
+  CourseEntry                 CourseEntry?
+  CustomEntry                 CustomEntry?
+}
+
+model EntryStartDate {
+  id         String    @id @default(cuid())
+  date       DateTime?
+  isVisible  Boolean   @default(true)
+  isOnlyYear Boolean   @default(false)
+
+  EntryDate EntryDate?
+}
+
+model EntryEndDate {
+  id            String    @id @default(cuid())
+  date          DateTime?
+  isCurrentDate Boolean   @default(false)
+  isVisible     Boolean   @default(true)
+  isOnlyYear    Boolean   @default(false)
+
+  EntryDate EntryDate?
+}
+
+model EntryDate {
+  id               String @id @default(cuid())
+  entryStartDateId String @unique
+  entryEndDateId   String @unique
+
+  EntryStartDate EntryStartDate @relation(fields: [entryStartDateId], references: [id], onDelete: Cascade)
+  EntryEndDate   EntryEndDate   @relation(fields: [entryEndDateId], references: [id], onDelete: Cascade)
+
+  EducationEntry              EducationEntry?
+  ProfessionalExperienceEntry ProfessionalExperienceEntry?
+  ProjectEntry                ProjectEntry?
+  CourseEntry                 CourseEntry?
+  CustomEntry                 CustomEntry?
+}
+
+model EducationEntry {
+  id              String  @id @default(cuid())
+  entryId         String  @unique
+  entryLocationId String  @unique
+  entryDateId     String  @unique
+  linkId          String?
+  school          String?
+  degree          String?
+  description     String?
+
+  Entry         Entry         @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  EntryLocation EntryLocation @relation(fields: [entryLocationId], references: [id], onDelete: Cascade)
+  EntryDate     EntryDate     @relation(fields: [entryDateId], references: [id], onDelete: Cascade)
+  Link          Link?         @relation(fields: [linkId], references: [id], onDelete: Cascade)
+}
+
+model ProfessionalExperienceEntry {
+  id              String  @id @default(cuid())
+  entryId         String  @unique
+  entryLocationId String  @unique
+  entryDateId     String  @unique
+  linkId          String?
+  jobTitle        String?
+  employer        String?
+  description     String?
+
+  Entry         Entry         @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  EntryLocation EntryLocation @relation(fields: [entryLocationId], references: [id], onDelete: Cascade)
+  EntryDate     EntryDate     @relation(fields: [entryDateId], references: [id], onDelete: Cascade)
+  Link          Link?         @relation(fields: [linkId], references: [id], onDelete: Cascade)
+}
+
+model ProjectEntry {
+  id          String  @id @default(cuid())
+  entryId     String  @unique
+  entryDateId String  @unique
+  linkId      String?
+  title       String
+  subtitle    String?
+  description String?
+
+  Entry     Entry     @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  EntryDate EntryDate @relation(fields: [entryDateId], references: [id], onDelete: Cascade)
+  Link      Link?     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+}
+
+model CourseEntry {
+  id              String  @id @default(cuid())
+  entryId         String  @unique
+  entryLocationId String  @unique
+  entryDateId     String  @unique
+  linkId          String?
+  title           String
+  institution     String?
+  description     String?
+
+  Entry         Entry         @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  LocationEntry EntryLocation @relation(fields: [entryLocationId], references: [id], onDelete: Cascade)
+  EntryDate     EntryDate     @relation(fields: [entryDateId], references: [id], onDelete: Cascade)
+  Link          Link?         @relation(fields: [linkId], references: [id], onDelete: Cascade)
+}
+
+model CustomEntry {
+  id              String  @id @default(cuid())
+  entryId         String  @unique
+  entryLocationId String  @unique
+  entryDateId     String  @unique
+  linkId          String?
+  title           String?
+  subtitle        String?
+  description     String?
+
+  Entry         Entry         @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  LocationEntry EntryLocation @relation(fields: [entryLocationId], references: [id], onDelete: Cascade)
+  EntryDate     EntryDate     @relation(fields: [entryDateId], references: [id], onDelete: Cascade)
+  Link          Link?         @relation(fields: [linkId], references: [id], onDelete: Cascade)
+}
+
+model SkillEntry {
+  id          String      @id @default(cuid())
+  entryId     String      @unique
+  name        String
+  information String?
+  skillLevel  SkillLevel?
+
+  Entry Entry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+}
+
+enum SkillLevel {
+  LEVEL_0
+  LEVEL_1
+  LEVEL_2
+  LEVEL_3
+  LEVEL_4
 }
