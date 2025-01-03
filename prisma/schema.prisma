@@ -15,41 +15,45 @@ datasource db {
 }
 
 model Account {
-  id                String             @id @default(cuid())
-  email             String             @unique
-  password          String
-  isVerified        Boolean            @default(false)
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  verificationToken VerificationToken?
-  refreshToken      RefreshToken?
+  id         String   @id @default(cuid())
+  email      String   @unique
+  password   String
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  VerificationToken VerificationToken?
+  RefreshToken      RefreshToken?
   Resume            Resume[]
 }
 
 model VerificationToken {
   id        String   @id @default(cuid())
   token     String   @unique
-  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId String   @unique
   createdAt DateTime @default(now())
   expiresAt DateTime
   isUsed    Boolean  @default(false)
+
+  Account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 }
 
 model RefreshToken {
   id        String   @id @default(cuid())
-  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId String   @unique
   tokenHash String
   createdAt DateTime @default(now())
   expiresAt DateTime
+
+  Account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 }
 
 model Resume {
   id        String   @id @default(cuid())
-  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId String
   title     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  Account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 }
