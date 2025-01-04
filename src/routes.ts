@@ -4,6 +4,8 @@ import {
   rootController,
   sessionController,
   resumeController,
+  profileController,
+  linkController,
 } from './controllers'
 import { authenticateSessionToken as authenticateSession } from './middlewares'
 
@@ -15,9 +17,13 @@ export const enum Routes {
   mySession = '/sessions/my',
   sessions = '/sessions',
   refreshMySession = '/sessions/my/refresh',
+  resumes = '/resumes',
   myResumes = '/my/resumes',
   myResumeById = '/my/resumes/:resumeId',
-  resumes = '/resumes',
+  profiles = '/profiles',
+  myProfiles = '/my/profiles',
+  links = '/links',
+  myLinks = '/my/links',
 }
 
 export const rootRouter = express.Router()
@@ -45,3 +51,13 @@ resumeRouter.get(
   resumeController.getById,
 )
 resumeRouter.post(Routes.resumes, authenticateSession, resumeController.post)
+
+export const profileRouter = express.Router()
+
+profileRouter.get(Routes.myProfiles, authenticateSession, profileController.get)
+profileRouter.post(Routes.profiles, authenticateSession, profileController.post)
+
+export const linkRouter = express.Router()
+
+linkRouter.get(Routes.myLinks, authenticateSession, linkController.get)
+linkRouter.post(Routes.links, authenticateSession, linkController.post)

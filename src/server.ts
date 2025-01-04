@@ -11,5 +11,7 @@ server.use(routes.rootRouter)
 server.use(routes.accountsRouter)
 server.use(routes.sessionsRouter)
 server.use(routes.resumeRouter)
+server.use(routes.profileRouter)
+server.use(routes.linkRouter)
 
 export default server
