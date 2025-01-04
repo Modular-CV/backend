@@ -70,3 +70,9 @@ sectionRouter.get(
   authenticateSession,
   controllers.section.getMySections,
 )
+
+sectionRouter.post(
+  Route.mySections,
+  authenticateSession,
+  controllers.section.postMySection,
+)
