@@ -1,4 +1,4 @@
-export enum ErrorCodes {
+export const enum ErrorCode {
   'AUTH-001' = 'Access token is missing',
   'AUTH-002' = 'Access token is invalid',
   'AUTH-003' = 'Invalid email or password',
@@ -12,4 +12,21 @@ export enum ErrorCodes {
   'ACC-001' = 'Email is already registered',
   'ACC-002' = 'Email could not be sent',
   'VER-001' = 'Verification token is invalid, expired or used',
+}
+
+export const enum Route {
+  root = '/',
+  myAccount = '/accounts/my',
+  accounts = '/accounts',
+  verifyAccount = '/accounts/verify/:token',
+  mySession = '/sessions/my',
+  sessions = '/sessions',
+  refreshMySession = '/sessions/my/refresh',
+  resumes = '/resumes',
+  myResumes = '/my/resumes',
+  myResumeById = '/my/resumes/:resumeId',
+  profiles = '/profiles',
+  myProfiles = '/my/profiles',
+  links = '/links',
+  myLinks = '/my/links',
 }

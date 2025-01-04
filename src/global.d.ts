@@ -1,10 +1,10 @@
 import * as core from 'express-serve-static-core'
 import { RequestHandler as ExpressRequestHandler } from 'express'
 import { ZodIssue } from 'zod'
-import { ErrorCodes } from './types'
+import { ErrorCode } from './types'
 import { Account } from '@prisma/client'
 import { JwtPayload } from 'jsonwebtoken'
-import { Routes } from './routes'
+import { Route } from './types'
 import TestAgent from 'supertest/lib/agent'
 import { Test } from 'supertest'
 
@@ -18,7 +18,7 @@ declare global {
         ? `:${Param}`
         : never
 
-  type RouteParser = <T extends Routes>(
+  type RouteParser = <T extends Route>(
     route: T,
     param: ExtractParams<T>,
     replace: string,
@@ -29,21 +29,21 @@ declare global {
   type CustomJwtPayload = { account: RequestAccount } & JwtPayload
 
   type SuperRequest = Omit<TestAgent, 'post' | 'get'> &
-    Record<'post' | 'get', (route: Routes | ParsedRoute) => Test>
+    Record<'post' | 'get', (route: Route | ParsedRoute) => Test>
 
-  type ResponseBody<ErrorCode = keyof typeof ErrorCodes | undefined> =
+  type ResponseBody<ErrorCode = keyof typeof ErrorCode | undefined> =
     ErrorCode extends undefined
       ? { status: 'SUCCESS'; data?: unknown; message?: string }
       : {
           status: 'ERROR'
-          message?: (typeof ErrorCodes)[ErrorCode]
+          message?: (typeof ErrorCode)[ErrorCode]
           error: ErrorCode
           data?: { issues: ZodIssue[] } | { details: string }
         }
 
   type RequestHandler<
     P = core.ParamsDictionary,
-    ResBody = ResponseBody<undefined | keyof typeof ErrorCodes>,
+    ResBody = ResponseBody<undefined | keyof typeof ErrorCode>,
     ReqBody = unknown,
     ReqQuery = core.Query,
     Locals extends Record<string, unknown> = Record<string, unknown>,

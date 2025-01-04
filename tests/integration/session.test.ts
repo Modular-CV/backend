@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker/.'
 import supertest from 'supertest'
-import { Routes } from '../../src/routes'
 import { generateAccountInput, createAccount, sleep } from '../utils'
 import server from '../../src/server'
+import { Route } from '../../src/types'
 
 const serverInstance = server.listen()
 let request = supertest.agent(serverInstance)
@@ -15,7 +15,7 @@ afterEach(() => {
   request = supertest.agent(serverInstance)
 })
 
-describe('POST ' + Routes.sessions, () => {
+describe('POST ' + Route.sessions, () => {
   const account = generateAccountInput()
 
   beforeAll(async () => {
@@ -23,7 +23,7 @@ describe('POST ' + Routes.sessions, () => {
   })
 
   test('should return status 200 and the jwts', async () => {
-    const response = await request.post(Routes.sessions).send(account)
+    const response = await request.post(Route.sessions).send(account)
 
     const cookies = response.headers['set-cookie']
     expect(cookies.length).toBe(2)
@@ -31,7 +31,7 @@ describe('POST ' + Routes.sessions, () => {
   })
 
   test('should return status 401 if the email and password do not match', async () => {
-    const response = await request.post(Routes.sessions).send({
+    const response = await request.post(Route.sessions).send({
       email: faker.internet.email(),
       password: faker.internet.password(),
     })
@@ -41,7 +41,7 @@ describe('POST ' + Routes.sessions, () => {
   })
 })
 
-describe('GET ' + Routes.mySession, () => {
+describe('GET ' + Route.mySession, () => {
   const account = generateAccountInput()
 
   beforeAll(async () => {
@@ -49,7 +49,7 @@ describe('GET ' + Routes.mySession, () => {
   })
 
   test('should return status 400 if there is no access cookie', async () => {
-    const response = await request.get(Routes.mySession)
+    const response = await request.get(Route.mySession)
     expect(response.status).toBe(400)
   })
 
@@ -59,11 +59,11 @@ describe('GET ' + Routes.mySession, () => {
 
     process.env.ACCESS_TOKEN_MAX_AGE = seconds
 
-    await request.post(Routes.sessions).send(account)
+    await request.post(Route.sessions).send(account)
 
     await sleep(seconds * 1.25)
 
-    const response = await request.get(Routes.mySession)
+    const response = await request.get(Route.mySession)
 
     expect(response.status).toBe(400)
 
@@ -71,8 +71,8 @@ describe('GET ' + Routes.mySession, () => {
   })
 
   test('should return 200 and the account if the token is valid and the account should not contain the password', async () => {
-    await request.post(Routes.sessions).send(account)
-    const response = await request.get(Routes.mySession)
+    await request.post(Route.sessions).send(account)
+    const response = await request.get(Route.mySession)
 
     expect(response.status).toBe(200)
 
@@ -87,7 +87,7 @@ describe('GET ' + Routes.mySession, () => {
   })
 })
 
-describe('POST ' + Routes.refreshMySession, () => {
+describe('POST ' + Route.refreshMySession, () => {
   const account = generateAccountInput()
 
   beforeAll(async () => {
@@ -95,14 +95,14 @@ describe('POST ' + Routes.refreshMySession, () => {
   })
 
   test('should return 400 when there is no refresh token', async () => {
-    const response = await request.post(Routes.refreshMySession)
+    const response = await request.post(Route.refreshMySession)
 
     expect(response.status).toBe(400)
   })
 
   test('Should return 200 and return the new tokens when a refresh token is used to request a new token', async () => {
-    await request.post(Routes.sessions).send(account)
-    const response = await request.post(Routes.refreshMySession)
+    await request.post(Route.sessions).send(account)
+    const response = await request.post(Route.refreshMySession)
 
     const cookies = response.headers['set-cookie']
     expect(cookies.length).toBe(2)
@@ -110,18 +110,18 @@ describe('POST ' + Routes.refreshMySession, () => {
   })
 
   test('should get different tokens for each session refresh', async () => {
-    const sessionResponse = await request.post(Routes.sessions).send(account)
+    const sessionResponse = await request.post(Route.sessions).send(account)
     const sessionCookies = sessionResponse.headers['set-cookie']
 
     await sleep(1000)
 
-    const firstRefreshResponse = await request.post(Routes.refreshMySession)
+    const firstRefreshResponse = await request.post(Route.refreshMySession)
     const firstRefreshResponseCookies =
       firstRefreshResponse.headers['set-cookie']
 
     await sleep(1000)
 
-    const secondRefreshResponse = await request.post(Routes.refreshMySession)
+    const secondRefreshResponse = await request.post(Route.refreshMySession)
     const secondRefreshResponseCookies =
       secondRefreshResponse.headers['set-cookie']
 
@@ -149,7 +149,7 @@ describe('POST ' + Routes.refreshMySession, () => {
   })
 
   test('should return 401 if the user tries to use an old refresh token', async () => {
-    const sessionResponse = await request.post(Routes.sessions).send(account)
+    const sessionResponse = await request.post(Route.sessions).send(account)
     const cookies = sessionResponse.headers['set-cookie']
     let oldRefreshToken = ''
 
@@ -161,12 +161,12 @@ describe('POST ' + Routes.refreshMySession, () => {
 
     await sleep(1000)
 
-    await request.post(Routes.refreshMySession)
+    await request.post(Route.refreshMySession)
 
     const newRequest = supertest.agent(serverInstance)
 
     const refreshResponse = await newRequest
-      .post(Routes.refreshMySession)
+      .post(Route.refreshMySession)
       .set('Cookie', oldRefreshToken)
 
     expect(refreshResponse.status).toBe(401)

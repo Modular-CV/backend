@@ -2,8 +2,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '.'
 import { hashString, routeParser, sendMail } from '../utils'
 import { z } from 'zod'
-import { ErrorCodes } from '../types'
-import { Routes } from '../routes'
+import { ErrorCode, Route } from '../types'
 
 export const verify: RequestHandler = async ({ params }, response) => {
   const verificationTokenQuery = params.token
@@ -21,7 +20,7 @@ export const verify: RequestHandler = async ({ params }, response) => {
     response.status(400)
     response.json({
       status: 'ERROR',
-      message: ErrorCodes['VER-001'],
+      message: ErrorCode['VER-001'],
       error: 'VER-001',
     })
     return
@@ -76,7 +75,7 @@ export const post: RequestHandler = async ({ body }, response) => {
     response.status(400)
     response.json({
       status: 'ERROR',
-      message: ErrorCodes['VAL-001'],
+      message: ErrorCode['VAL-001'],
       error: 'VAL-001',
       data: {
         issues: validator.error.issues,
@@ -97,7 +96,7 @@ export const post: RequestHandler = async ({ body }, response) => {
     response.status(409)
     response.json({
       status: 'ERROR',
-      message: ErrorCodes['ACC-001'],
+      message: ErrorCode['ACC-001'],
       error: 'ACC-001',
     })
     return
@@ -116,7 +115,7 @@ export const post: RequestHandler = async ({ body }, response) => {
       <div>
         <h1>${projectName}</h1>
         <p>Thank you for registering!</p>
-        <p>To complete your registration, please verify your email by clicking <a href="${domain}${routeParser(Routes.verifyAccount, ':token', token)}">here</a>.</p>
+        <p>To complete your registration, please verify your email by clicking <a href="${domain}${routeParser(Route.verifyAccount, ':token', token)}">here</a>.</p>
       </div>
       `,
   })
@@ -125,7 +124,7 @@ export const post: RequestHandler = async ({ body }, response) => {
     response.status(500)
     response.json({
       status: 'ERROR',
-      message: ErrorCodes['ACC-002'],
+      message: ErrorCode['ACC-002'],
       error: 'ACC-002',
     })
     return

@@ -2,9 +2,8 @@ import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { prisma } from '.'
 import { generateSessionToken, hashString, verifyHashedString } from '../utils'
-import { ErrorCodes } from '../types'
+import { ErrorCode, Route } from '../types'
 import jwt from 'jsonwebtoken'
-import { Routes } from '../routes'
 import { Response } from 'express'
 
 /**
@@ -50,7 +49,7 @@ const generateSessionTokens = async (
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE),
-    path: Routes.refreshMySession,
+    path: Route.refreshMySession,
   })
 }
 
@@ -60,7 +59,7 @@ export const refresh: RequestHandler = async ({ cookies }, response) => {
   if (!refreshToken) {
     response.status(400).json({
       status: 'ERROR',
-      message: ErrorCodes['AUTH-006'],
+      message: ErrorCode['AUTH-006'],
       error: 'AUTH-006',
     })
     return
@@ -75,7 +74,7 @@ export const refresh: RequestHandler = async ({ cookies }, response) => {
           case 'invalid token': {
             response.status(401).json({
               status: 'ERROR',
-              message: ErrorCodes['AUTH-007'],
+              message: ErrorCode['AUTH-007'],
               error: 'AUTH-007',
             })
             return
@@ -83,7 +82,7 @@ export const refresh: RequestHandler = async ({ cookies }, response) => {
           case 'jwt expired': {
             response.status(401).json({
               status: 'ERROR',
-              message: ErrorCodes['AUTH-008'],
+              message: ErrorCode['AUTH-008'],
               error: 'AUTH-008',
             })
             return
@@ -94,7 +93,7 @@ export const refresh: RequestHandler = async ({ cookies }, response) => {
               data: {
                 details: error.message,
               },
-              message: ErrorCodes['AUTH-007'],
+              message: ErrorCode['AUTH-007'],
               error: 'AUTH-007',
             })
             return
@@ -114,7 +113,7 @@ export const refresh: RequestHandler = async ({ cookies }, response) => {
         if (!refreshTokenFound) {
           response.status(401).json({
             status: 'ERROR',
-            message: ErrorCodes['AUTH-007'],
+            message: ErrorCode['AUTH-007'],
             error: 'AUTH-007',
           })
           return
@@ -128,7 +127,7 @@ export const refresh: RequestHandler = async ({ cookies }, response) => {
         if (!isMatch) {
           response.status(401).json({
             status: 'ERROR',
-            message: ErrorCodes['AUTH-007'],
+            message: ErrorCode['AUTH-007'],
             error: 'AUTH-007',
           })
           return
@@ -165,7 +164,7 @@ export const post: RequestHandler = async ({ body }, response) => {
     response.status(400)
     response.json({
       status: 'ERROR',
-      message: ErrorCodes['VAL-001'],
+      message: ErrorCode['VAL-001'],
       error: 'VAL-001',
     })
     return
@@ -193,7 +192,7 @@ export const post: RequestHandler = async ({ body }, response) => {
     response.status(401)
     response.json({
       status: 'ERROR',
-      message: ErrorCodes['AUTH-003'],
+      message: ErrorCode['AUTH-003'],
       error: 'AUTH-003',
     })
     return
@@ -207,7 +206,7 @@ export const post: RequestHandler = async ({ body }, response) => {
     response.status(401)
     response.json({
       status: 'ERROR',
-      message: ErrorCodes['AUTH-003'],
+      message: ErrorCode['AUTH-003'],
       error: 'AUTH-003',
     })
     return

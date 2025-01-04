@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { prisma } from '.'
 import { Prisma } from '@prisma/client'
-import { ErrorCodes } from '../types'
+import { ErrorCode } from '../types'
 
 export const get: RequestHandler = async ({ accessToken }, response) => {
   const profiles = await prisma.profile.findMany({
@@ -37,7 +37,7 @@ export const post: RequestHandler = async ({ body, accessToken }, response) => {
   if (!validator.success) {
     response.status(400).json({
       status: 'ERROR',
-      message: ErrorCodes['VAL-001'],
+      message: ErrorCode['VAL-001'],
       error: 'VAL-001',
       data: {
         issues: validator.error.issues,

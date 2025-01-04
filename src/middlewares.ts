@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { ErrorCodes } from './types'
+import { ErrorCode } from './types'
 
 export const authenticateSessionToken: RequestHandler = (
   request,
@@ -15,7 +15,7 @@ export const authenticateSessionToken: RequestHandler = (
   if (!accessToken) {
     response.status(400).json({
       status: 'ERROR',
-      message: ErrorCodes['AUTH-001'],
+      message: ErrorCode['AUTH-001'],
       error: 'AUTH-001',
     })
     return
@@ -27,7 +27,7 @@ export const authenticateSessionToken: RequestHandler = (
         case 'invalid token': {
           response.status(401).json({
             status: 'ERROR',
-            message: ErrorCodes['AUTH-002'],
+            message: ErrorCode['AUTH-002'],
             error: 'AUTH-002',
           })
           return
@@ -35,7 +35,7 @@ export const authenticateSessionToken: RequestHandler = (
         case 'jwt expired': {
           response.status(401).json({
             status: 'ERROR',
-            message: ErrorCodes['AUTH-005'],
+            message: ErrorCode['AUTH-005'],
             error: 'AUTH-005',
           })
           return
@@ -46,7 +46,7 @@ export const authenticateSessionToken: RequestHandler = (
             data: {
               details: error.message,
             },
-            message: ErrorCodes['AUTH-002'],
+            message: ErrorCode['AUTH-002'],
             error: 'AUTH-002',
           })
           return

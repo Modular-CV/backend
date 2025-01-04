@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker/.'
-import { Routes } from '../../src/routes'
 import { routeParser } from '../../src/utils'
 import {
   createAccount,
@@ -8,6 +7,7 @@ import {
 } from '../utils'
 import supertest from 'supertest'
 import server from '../../src/server'
+import { Route } from '../../src/types'
 
 const serverInstance = server.listen()
 const request = supertest.agent(serverInstance)
@@ -16,31 +16,31 @@ afterAll(() => {
   serverInstance.close()
 })
 
-describe('GET ' + Routes.myResumes, () => {
+describe('GET ' + Route.myResumes, () => {
   beforeAll(async () => {
     const account = generateAccountInput()
     await createAccount(account)
-    await request.post(Routes.sessions).send(account)
+    await request.post(Route.sessions).send(account)
   })
 
   test('should return status 200', async () => {
-    const response = await request.get(Routes.myResumes)
+    const response = await request.get(Route.myResumes)
 
     expect(response.status).toBe(200)
   })
 })
 
-describe('POST ' + Routes.resumes, () => {
+describe('POST ' + Route.resumes, () => {
   beforeAll(async () => {
     const account = generateAccountInput()
     await createAccount(account)
-    await request.post(Routes.sessions).send(account)
+    await request.post(Route.sessions).send(account)
   })
 
   test('should return status 200 and the resume with id', async () => {
     const resumeInput = generateResumeInput()
 
-    const response = await request.post(Routes.resumes).send(resumeInput)
+    const response = await request.post(Route.resumes).send(resumeInput)
 
     expect(response.status).toBe(200)
 
@@ -53,16 +53,16 @@ describe('POST ' + Routes.resumes, () => {
   })
 })
 
-describe('GET ' + Routes.myResumeById, () => {
+describe('GET ' + Route.myResumeById, () => {
   beforeAll(async () => {
     const account = generateAccountInput()
     await createAccount(account)
-    await request.post(Routes.sessions).send(account)
+    await request.post(Route.sessions).send(account)
   })
 
   test('should return status 404 for resume id not found', async () => {
     const response = await request.get(
-      routeParser(Routes.myResumeById, ':resumeId', faker.string.ulid()),
+      routeParser(Route.myResumeById, ':resumeId', faker.string.ulid()),
     )
     expect(response.status).toBe(404)
   })
@@ -73,10 +73,10 @@ describe('GET ' + Routes.myResumeById, () => {
       body: {
         data: { resume },
       },
-    } = await request.post(Routes.resumes).send(resumeInput)
+    } = await request.post(Route.resumes).send(resumeInput)
 
     const response = await request.get(
-      routeParser(Routes.myResumeById, ':resumeId', resume.id),
+      routeParser(Route.myResumeById, ':resumeId', resume.id),
     )
 
     const {

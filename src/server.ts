@@ -7,11 +7,8 @@ const server = express()
 server.use(express.json())
 server.use(cookieParser())
 
-server.use(routes.rootRouter)
-server.use(routes.accountsRouter)
-server.use(routes.sessionsRouter)
-server.use(routes.resumeRouter)
-server.use(routes.profileRouter)
-server.use(routes.linkRouter)
+for (const router of Object.values(routes)) {
+  server.use(router)
+}
 
 export default server

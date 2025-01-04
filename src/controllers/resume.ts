@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { prisma } from '.'
 import { Prisma } from '@prisma/client'
-import { ErrorCodes } from '../types'
+import { ErrorCode } from '../types'
 
 export const get: RequestHandler = async ({ accessToken }, response) => {
   const resumes = await prisma.resume.findMany({
@@ -29,7 +29,7 @@ export const post: RequestHandler = async ({ accessToken, body }, response) => {
     response.status(400)
     response.json({
       status: 'ERROR',
-      message: ErrorCodes['VAL-001'],
+      message: ErrorCode['VAL-001'],
       error: 'VAL-001',
       data: {
         issues: validator.error.issues,
@@ -67,7 +67,7 @@ export const getById: RequestHandler = async ({ params }, response) => {
   if (!resume) {
     response.status(404).json({
       status: 'ERROR',
-      message: ErrorCodes['VAL-002'],
+      message: ErrorCode['VAL-002'],
       error: 'VAL-002',
     })
     return
