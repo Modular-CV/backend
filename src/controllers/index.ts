@@ -1,10 +1,10 @@
 import { PrismaClient } from '@prisma/client'
-import * as rootController from './root'
-import * as accountController from './account'
-import * as sessionController from './session'
-import * as resumeController from './resume'
-import * as profileController from './profile'
-import * as linkController from './link'
+import * as root from './root'
+import * as account from './account'
+import * as session from './session'
+import * as resume from './resume'
+import * as profile from './profile'
+import * as link from './link'
 
 export const prisma = new PrismaClient({
   omit: {
@@ -14,11 +14,4 @@ export const prisma = new PrismaClient({
   },
 })
 
-export {
-  rootController,
-  accountController,
-  sessionController,
-  resumeController,
-  profileController,
-  linkController,
-}
+export { root, account, session, resume, profile, link }
