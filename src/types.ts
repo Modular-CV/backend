@@ -22,12 +22,9 @@ export const enum Route {
   mySession = '/sessions/my',
   sessions = '/sessions',
   refreshMySession = '/sessions/my/refresh',
-  resumes = '/resumes',
   myResumes = '/my/resumes',
   myResumeById = '/my/resumes/:resumeId',
-  profiles = '/profiles',
   myProfiles = '/my/profiles',
-  links = '/links',
   myLinks = '/my/links',
-  sections = '/sections',
+  mySections = '/my/sections',
 }

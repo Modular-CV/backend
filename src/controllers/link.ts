@@ -3,7 +3,7 @@ import { prisma } from '.'
 import { Prisma } from '@prisma/client'
 import { ErrorCode } from '../types'
 
-export const get: RequestHandler = async ({ accessToken }, response) => {
+export const getMyLinks: RequestHandler = async ({ accessToken }, response) => {
   const links = await prisma.link.findMany({
     where: {
       accountId: accessToken?.account.id,
@@ -18,7 +18,10 @@ export const get: RequestHandler = async ({ accessToken }, response) => {
   })
 }
 
-export const post: RequestHandler = async ({ body, accessToken }, response) => {
+export const postMyLink: RequestHandler = async (
+  { body, accessToken },
+  response,
+) => {
   const validatorObject = z.object({
     url: z.string(),
   }) satisfies z.Schema<Prisma.LinkCreateWithoutAccountInput>

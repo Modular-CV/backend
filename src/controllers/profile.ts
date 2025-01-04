@@ -3,7 +3,10 @@ import { prisma } from '.'
 import { Prisma } from '@prisma/client'
 import { ErrorCode } from '../types'
 
-export const get: RequestHandler = async ({ accessToken }, response) => {
+export const getMyProfiles: RequestHandler = async (
+  { accessToken },
+  response,
+) => {
   const profiles = await prisma.profile.findMany({
     where: {
       accountId: accessToken?.account.id,
@@ -18,7 +21,10 @@ export const get: RequestHandler = async ({ accessToken }, response) => {
   })
 }
 
-export const post: RequestHandler = async ({ body, accessToken }, response) => {
+export const postMyProfile: RequestHandler = async (
+  { body, accessToken },
+  response,
+) => {
   const inputs = {
     fullName: z.string(),
     jobTitle: z.string().optional(),

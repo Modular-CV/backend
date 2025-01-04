@@ -25,7 +25,7 @@ describe('GET' + Route.myProfiles, () => {
   })
 })
 
-describe('POST' + Route.profiles, () => {
+describe('POST' + Route.myProfiles, () => {
   test('should return status 200 and the profile with id', async () => {
     const profileInput =
       Prisma.validator<Prisma.ProfileCreateWithoutAccountInput>()({
@@ -36,7 +36,7 @@ describe('POST' + Route.profiles, () => {
         address: faker.location.streetAddress(),
       })
 
-    const response = await request.post(Route.profiles).send(profileInput)
+    const response = await request.post(Route.myProfiles).send(profileInput)
 
     const {
       data: { profile },

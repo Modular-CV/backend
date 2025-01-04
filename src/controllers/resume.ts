@@ -3,7 +3,10 @@ import { prisma } from '.'
 import { Prisma } from '@prisma/client'
 import { ErrorCode } from '../types'
 
-export const get: RequestHandler = async ({ accessToken }, response) => {
+export const getMyResumes: RequestHandler = async (
+  { accessToken },
+  response,
+) => {
   const resumes = await prisma.resume.findMany({
     where: {
       accountId: accessToken?.account.id,
@@ -18,7 +21,10 @@ export const get: RequestHandler = async ({ accessToken }, response) => {
   })
 }
 
-export const post: RequestHandler = async ({ accessToken, body }, response) => {
+export const postMyResume: RequestHandler = async (
+  { accessToken, body },
+  response,
+) => {
   const validatorObject = z.object({
     title: z.string(),
   }) satisfies z.Schema<Prisma.ResumeCreateWithoutAccountInput>

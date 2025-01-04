@@ -1,6 +1,6 @@
 import { prisma } from '.'
 
-export const get: RequestHandler = ({ accessToken }, response) => {
+export const getMySections: RequestHandler = ({ accessToken }, response) => {
   const sections = prisma.section.findMany({
     where: {
       accountId: accessToken?.account.id,

@@ -30,7 +30,7 @@ describe('GET ' + Route.myResumes, () => {
   })
 })
 
-describe('POST ' + Route.resumes, () => {
+describe('POST ' + Route.myResumes, () => {
   beforeAll(async () => {
     const account = generateAccountInput()
     await createAccount(account)
@@ -40,7 +40,7 @@ describe('POST ' + Route.resumes, () => {
   test('should return status 200 and the resume with id', async () => {
     const resumeInput = generateResumeInput()
 
-    const response = await request.post(Route.resumes).send(resumeInput)
+    const response = await request.post(Route.myResumes).send(resumeInput)
 
     expect(response.status).toBe(200)
 
@@ -73,7 +73,7 @@ describe('GET ' + Route.myResumeById, () => {
       body: {
         data: { resume },
       },
-    } = await request.post(Route.resumes).send(resumeInput)
+    } = await request.post(Route.myResumes).send(resumeInput)
 
     const response = await request.get(
       routeParser(Route.myResumeById, ':resumeId', resume.id),

@@ -29,32 +29,44 @@ sessionsRouter.post(Route.sessions, controllers.session.post)
 
 export const resumeRouter = express.Router()
 
-resumeRouter.get(Route.myResumes, authenticateSession, controllers.resume.get)
+resumeRouter.get(
+  Route.myResumes,
+  authenticateSession,
+  controllers.resume.getMyResumes,
+)
 resumeRouter.get(
   Route.myResumeById,
   authenticateSession,
   controllers.resume.getById,
 )
-resumeRouter.post(Route.resumes, authenticateSession, controllers.resume.post)
+resumeRouter.post(
+  Route.myResumes,
+  authenticateSession,
+  controllers.resume.postMyResume,
+)
 
 export const profileRouter = express.Router()
 
 profileRouter.get(
   Route.myProfiles,
   authenticateSession,
-  controllers.profile.get,
+  controllers.profile.getMyProfiles,
 )
 profileRouter.post(
-  Route.profiles,
+  Route.myProfiles,
   authenticateSession,
-  controllers.profile.post,
+  controllers.profile.postMyProfile,
 )
 
 export const linkRouter = express.Router()
 
-linkRouter.get(Route.myLinks, authenticateSession, controllers.link.get)
-linkRouter.post(Route.links, authenticateSession, controllers.link.post)
+linkRouter.get(Route.myLinks, authenticateSession, controllers.link.getMyLinks)
+linkRouter.post(Route.myLinks, authenticateSession, controllers.link.postMyLink)
 
 export const sectionRouter = express.Router()
 
-sectionRouter.get(Route.sections, authenticateSession, controllers.section.get)
+sectionRouter.get(
+  Route.mySections,
+  authenticateSession,
+  controllers.section.getMySections,
+)

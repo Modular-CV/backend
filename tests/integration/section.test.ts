@@ -16,9 +16,9 @@ afterAll(() => {
   serverInstance.close()
 })
 
-describe('GET ' + Route.sections, () => {
+describe('GET ' + Route.mySections, () => {
   test('should return 200', async () => {
-    const response = await request.get(Route.sections)
+    const response = await request.get(Route.mySections)
     expect(response.status).toBe(200)
   })
 })
