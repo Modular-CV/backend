@@ -36,11 +36,7 @@ describe('POST' + Route.mySections, () => {
 
     expect(response.status).toBe(200)
 
-    console.log(response.body)
-
-    const {
-      data: { section },
-    } = response.body
+    const section = response.body.data.section
 
     expect(section.id).toBeTruthy()
   })

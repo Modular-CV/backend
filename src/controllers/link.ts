@@ -40,7 +40,7 @@ export const postMyLink: RequestHandler = async (
     return
   }
 
-  const { data } = validator
+  const data = validator.data
 
   const link = await prisma.link.create({
     data: {

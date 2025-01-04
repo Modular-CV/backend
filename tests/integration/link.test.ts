@@ -35,9 +35,7 @@ describe('POST ' + Route.myLinks, () => {
 
     expect(response.status).toBe(200)
 
-    const {
-      data: { link },
-    } = response.body
+    const link = response.body.data.link
 
     expect(link.id).toBeTruthy()
   })

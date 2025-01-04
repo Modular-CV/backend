@@ -7,7 +7,7 @@ import * as profile from './profile'
 import * as link from './link'
 import * as section from './section'
 
-export const prisma = new PrismaClient({
+const prisma = new PrismaClient({
   omit: {
     account: {
       password: true,
@@ -15,4 +15,4 @@ export const prisma = new PrismaClient({
   },
 })
 
-export { root, account, session, resume, profile, link, section }
+export { prisma, root, account, session, resume, profile, link, section }

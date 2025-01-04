@@ -38,13 +38,10 @@ describe('POST' + Route.myProfiles, () => {
 
     const response = await request.post(Route.myProfiles).send(profileInput)
 
-    const {
-      data: { profile },
-    } = response.body
-
-    console.log(profile)
-
     expect(response.status).toBe(200)
+
+    const profile = response.body.data.profile
+
     expect(profile.id).toBeTruthy()
   })
 })

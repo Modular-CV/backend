@@ -44,7 +44,7 @@ export const postMyResume: RequestHandler = async (
     return
   }
 
-  const { data } = validator
+  const data = validator.data
 
   const resume = await prisma.resume.create({
     data: {

@@ -44,9 +44,7 @@ describe('POST ' + Route.myResumes, () => {
 
     expect(response.status).toBe(200)
 
-    const {
-      data: { resume },
-    } = response.body
+    const resume = response.body.data.resume
 
     expect(resume.id).toBeTruthy()
     expect(resume.title).toBe(resumeInput.title)
@@ -69,22 +67,20 @@ describe('GET ' + Route.myResumeById, () => {
 
   test('should return status 200 and the resume for a valid resume id', async () => {
     const resumeInput = generateResumeInput()
-    const {
-      body: {
-        data: { resume },
-      },
-    } = await request.post(Route.myResumes).send(resumeInput)
 
-    const response = await request.get(
-      routeParser(Route.myResumeById, ':resumeId', resume.id),
+    const firstResponse = await request.post(Route.myResumes).send(resumeInput)
+
+    const resumeId = firstResponse.body.data.resume.id
+
+    const secondResponse = await request.get(
+      routeParser(Route.myResumeById, ':resumeId', resumeId),
     )
 
-    const {
-      body: { data },
-    } = response
+    expect(secondResponse.status).toBe(200)
 
-    expect(response.status).toBe(200)
-    expect(data.resume.id).toBeTruthy()
-    expect(data.resume.title).toBe(resumeInput.title)
+    const resume = secondResponse.body.data.resume
+
+    expect(resume.id).toBeTruthy()
+    expect(resume.title).toBe(resumeInput.title)
   })
 })

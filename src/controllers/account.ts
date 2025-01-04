@@ -84,7 +84,7 @@ export const post: RequestHandler = async ({ body }, response) => {
     return
   }
 
-  const { data } = validator
+  const data = validator.data
 
   const count = await prisma.account.count({
     where: {

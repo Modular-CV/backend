@@ -52,7 +52,7 @@ export const postMyProfile: RequestHandler = async (
     return
   }
 
-  const { data } = validator
+  const data = validator.data
 
   const profile = await prisma.profile.create({
     data: {

@@ -37,9 +37,7 @@ describe('POST ' + Route.accounts, () => {
 
     expect(response.status).toBe(200)
 
-    const {
-      data: { account: newAccount },
-    } = response.body
+    const newAccount = response.body.data.account
 
     expect(newAccount.id).toBeTruthy()
     expect(newAccount.email).toBe(account.email)

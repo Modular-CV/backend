@@ -40,7 +40,7 @@ export const postMySection: RequestHandler = async (
     return
   }
 
-  const { data } = validator
+  const data = validator.data
 
   const section = await prisma.section.create({
     data: {
