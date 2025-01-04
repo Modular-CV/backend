@@ -2,6 +2,11 @@
 
 This is the backend for a curriculum builder project: a modular and free-to-use resume builder designed for individuals, allowing them to create, share, and download their resumes while featuring integrated social interaction.
 
+## Project Documents
+
+- [Prisma Diagram](https://github.com/Modular-CV/backend/blob/main/docs/prisma-editor.png)
+- Endpoints (In Progress)
+
 ## Tech Stack
 
 ### Base
