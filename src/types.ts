@@ -29,4 +29,5 @@ export const enum Route {
   myProfiles = '/my/profiles',
   links = '/links',
   myLinks = '/my/links',
+  sections = '/sections',
 }

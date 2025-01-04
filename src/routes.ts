@@ -54,3 +54,7 @@ export const linkRouter = express.Router()
 
 linkRouter.get(Route.myLinks, authenticateSession, controllers.link.get)
 linkRouter.post(Route.links, authenticateSession, controllers.link.post)
+
+export const sectionRouter = express.Router()
+
+sectionRouter.get(Route.sections, authenticateSession, controllers.section.get)
