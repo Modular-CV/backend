@@ -77,19 +77,6 @@ model ResumeSection {
   @@unique([resumeId, sectionOrder])
 }
 
-model Section {
-  id        String   @id @default(cuid())
-  accountId String
-  title     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  Account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
-
-  ResumeSection ResumeSection[]
-  Entry         Entry?
-}
-
 model Profile {
   id        String   @id @default(cuid())
   accountId String
@@ -118,10 +105,27 @@ model Link {
   CustomEntry                 CustomEntry[]
 }
 
+model Section {
+  id        String    @id @default(cuid())
+  accountId String
+  title     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  entryType EntryType
+
+  Account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  ResumeSection ResumeSection[]
+  Entry         Entry[]
+}
+
 model Entry {
-  id        String  @id @default(cuid())
-  sectionId String  @unique
-  isVisible Boolean @default(true)
+  id        String    @id @default(cuid())
+  sectionId String
+  isVisible Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  entryType EntryType
 
   Section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
 
@@ -272,4 +276,13 @@ enum SkillLevel {
   LEVEL_2
   LEVEL_3
   LEVEL_4
+}
+
+enum EntryType {
+  SKILL
+  PROJECT
+  PROFESSIONAL_EXPERIENCE
+  EDUCATION
+  COURSE
+  CUSTOM
 }

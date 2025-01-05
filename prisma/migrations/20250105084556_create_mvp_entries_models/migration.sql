@@ -1,6 +1,9 @@
 -- CreateEnum
 CREATE TYPE "SkillLevel" AS ENUM ('LEVEL_0', 'LEVEL_1', 'LEVEL_2', 'LEVEL_3', 'LEVEL_4');
 
+-- CreateEnum
+CREATE TYPE "EntryType" AS ENUM ('SKILL', 'PROJECT', 'PROFESSIONAL_EXPERIENCE', 'EDUCATION', 'COURSE', 'CUSTOM');
+
 -- AlterTable
 ALTER TABLE "Resume" ADD COLUMN     "profileId" TEXT;
 
@@ -12,17 +15,6 @@ CREATE TABLE "ResumeSection" (
     "sectionOrder" INTEGER NOT NULL,
 
     CONSTRAINT "ResumeSection_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Section" (
-    "id" TEXT NOT NULL,
-    "accountId" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Section_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -50,10 +42,25 @@ CREATE TABLE "Link" (
 );
 
 -- CreateTable
+CREATE TABLE "Section" (
+    "id" TEXT NOT NULL,
+    "accountId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "entryType" "EntryType" NOT NULL,
+
+    CONSTRAINT "Section_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Entry" (
     "id" TEXT NOT NULL,
     "sectionId" TEXT NOT NULL,
     "isVisible" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "entryType" "EntryType" NOT NULL,
 
     CONSTRAINT "Entry_pkey" PRIMARY KEY ("id")
 );
@@ -181,9 +188,6 @@ CREATE TABLE "SkillEntry" (
 CREATE UNIQUE INDEX "ResumeSection_resumeId_sectionOrder_key" ON "ResumeSection"("resumeId", "sectionOrder");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Entry_sectionId_key" ON "Entry"("sectionId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "EntryDate_entryStartDateId_key" ON "EntryDate"("entryStartDateId");
 
 -- CreateIndex
@@ -244,13 +248,13 @@ ALTER TABLE "ResumeSection" ADD CONSTRAINT "ResumeSection_resumeId_fkey" FOREIGN
 ALTER TABLE "ResumeSection" ADD CONSTRAINT "ResumeSection_sectionId_fkey" FOREIGN KEY ("sectionId") REFERENCES "Section"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Section" ADD CONSTRAINT "Section_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "Account"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Profile" ADD CONSTRAINT "Profile_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "Account"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Link" ADD CONSTRAINT "Link_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "Account"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Section" ADD CONSTRAINT "Section_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "Account"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Entry" ADD CONSTRAINT "Entry_sectionId_fkey" FOREIGN KEY ("sectionId") REFERENCES "Section"("id") ON DELETE CASCADE ON UPDATE CASCADE;
