@@ -76,3 +76,17 @@ sectionRouter.post(
   authenticateSession,
   controllers.section.postMySection,
 )
+
+export const entryRouter = express.Router()
+
+sectionRouter.get(
+  Route.mySectionEntries,
+  authenticateSession,
+  controllers.entry.getMySectionEntries,
+)
+
+sectionRouter.post(
+  Route.mySectionEntries,
+  authenticateSession,
+  controllers.entry.postMySectionEntry,
+)

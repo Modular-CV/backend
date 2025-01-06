@@ -1,9 +1,11 @@
 import supertest from 'supertest'
 import server from '../../src/server'
-import { createAccount, generateAccountInput } from '../utils'
+import {
+  createAccount,
+  generateAccountInput,
+  generateSectionInput,
+} from '../utils'
 import { Route } from '../../src/types'
-import { Prisma } from '@prisma/client'
-import { faker } from '@faker-js/faker/.'
 
 const serverInstance = server.listen()
 const request = supertest.agent(serverInstance)
@@ -27,11 +29,7 @@ describe('GET ' + Route.mySections, () => {
 
 describe('POST' + Route.mySections, () => {
   test('should return 200 and the section id', async () => {
-    const sectionInput =
-      Prisma.validator<Prisma.SectionCreateWithoutAccountInput>()({
-        title: faker.book.title(),
-      })
-
+    const sectionInput = generateSectionInput()
     const response = await request.post(Route.mySections).send(sectionInput)
 
     expect(response.status).toBe(200)

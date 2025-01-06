@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { prisma } from '.'
-import { Prisma } from '@prisma/client'
+import { EntryType, Prisma } from '@prisma/client'
 import { ErrorCode } from '../types'
 
 export const getMySections: RequestHandler = ({ accessToken }, response) => {
@@ -24,6 +24,7 @@ export const postMySection: RequestHandler = async (
 ) => {
   const validatorObject = z.object({
     title: z.string(),
+    entryType: z.nativeEnum(EntryType),
   }) satisfies z.Schema<Prisma.SectionCreateWithoutAccountInput>
 
   const validator = validatorObject.safeParse(body)

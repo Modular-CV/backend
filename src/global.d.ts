@@ -7,8 +7,65 @@ import { JwtPayload } from 'jsonwebtoken'
 import { Route } from './types'
 import TestAgent from 'supertest/lib/agent'
 import { Test } from 'supertest'
+import { Prisma } from '@prisma/client'
 
 declare global {
+  type EntryUncheckedCreateInput = Omit<
+    Prisma.EntryUncheckedCreateInput,
+    'sectionId'
+  >
+
+  type EntryDateUncheckedCreateInput = Omit<
+    Prisma.EntryDateUncheckedCreateInput,
+    'entryStartDateId' | 'entryEndDateId'
+  > & {
+    entryStartDate: Prisma.EntryStartDateUncheckedCreateInput
+    entryEndDate: Prisma.EntryEndDateUncheckedCreateInput
+  }
+
+  type EntryUncheckedCreateInputWithLocationAndDate = {
+    entryLocation: Prisma.EntryLocationUncheckedCreateInput
+  } & {
+    entryDate: EntryDateUncheckedCreateInput
+  }
+
+  type SkillEntryUncheckedCreateInput = EntryUncheckedCreateInput &
+    Omit<Prisma.SkillEntryUncheckedCreateInput, 'entryId'>
+
+  type ProjectEntryUncheckedCreateInput = EntryUncheckedCreateInput &
+    Omit<Prisma.ProjectEntryUncheckedCreateInput, 'entryId' | 'entryDateId'> & {
+      entryDate: EntryDateUncheckedCreateInput
+    }
+
+  type ProfessionalExperienceEntryUncheckedCreateInput =
+    EntryUncheckedCreateInput &
+      Omit<
+        Prisma.ProfessionalExperienceEntryUncheckedCreateInput,
+        'entryId' | 'entryLocationId' | 'entryDateId'
+      > &
+      EntryUncheckedCreateInputWithLocationAndDate
+
+  type EducationEntryUncheckedCreateInput = EntryUncheckedCreateInput &
+    Omit<
+      Prisma.EducationEntryUncheckedCreateInput,
+      'entryId' | 'entryLocationId' | 'entryDateId'
+    > &
+    EntryUncheckedCreateInputWithLocationAndDate
+
+  type CourseEntryUncheckedCreateInput = EntryUncheckedCreateInput &
+    Omit<
+      Prisma.CourseEntryUncheckedCreateInput,
+      'entryId' | 'entryLocationId' | 'entryDateId'
+    > &
+    EntryUncheckedCreateInputWithLocationAndDate
+
+  type CustomEntryUncheckedCreateInput = EntryUncheckedCreateInput &
+    Omit<
+      Prisma.CustomEntryUncheckedCreateInput,
+      'entryId' | 'entryLocationId' | 'entryDateId'
+    > &
+    EntryUncheckedCreateInputWithLocationAndDate
+
   type ParsedRoute = string & { __brand: 'ParsedRoute' }
 
   type ExtractParams<T extends string> =
@@ -44,7 +101,8 @@ declare global {
   type RequestHandler<
     P = core.ParamsDictionary,
     ResBody = ResponseBody<undefined | keyof typeof ErrorCode>,
-    ReqBody = unknown,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ReqBody = any,
     ReqQuery = core.Query,
     Locals extends Record<string, unknown> = Record<string, unknown>,
   > = ExpressRequestHandler<P, ResBody, ReqBody, ReqQuery, Locals>

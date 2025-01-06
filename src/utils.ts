@@ -4,6 +4,31 @@ import { MailOptions } from 'nodemailer/lib/sendmail-transport'
 import argon2 from 'argon2'
 import SMTPTransport from 'nodemailer/lib/smtp-transport'
 
+export const pascalToCamel = (key: string): string => {
+  return key.replace(/^([A-Z])/, (match) => match.toLowerCase())
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const normalizeOutput = (object: Record<string, any>) => {
+  console.log(object)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const output: Record<string, any> = {}
+
+  for (const key in object) {
+    const currentValue = object[key]
+    const camelCasedKey = pascalToCamel(key)
+    output[camelCasedKey] =
+      currentValue &&
+      typeof currentValue === 'object' &&
+      !Array.isArray(currentValue) &&
+      !(currentValue instanceof Date)
+        ? normalizeOutput(currentValue)
+        : object[key]
+  }
+
+  return output
+}
+
 export const routeParser: RouteParser = (route, id, replace) => {
   return route.replace(id, replace) as ParsedRoute
 }

@@ -75,6 +75,9 @@ export const getById: RequestHandler = async ({ params }, response) => {
       status: 'ERROR',
       message: ErrorCode['VAL-002'],
       error: 'VAL-002',
+      data: {
+        details: `Resource id: ${resumeId}`,
+      },
     })
     return
   }

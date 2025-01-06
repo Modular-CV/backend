@@ -6,6 +6,7 @@ import * as resume from './resume'
 import * as profile from './profile'
 import * as link from './link'
 import * as section from './section'
+import * as entry from './entry'
 
 const prisma = new PrismaClient({
   omit: {
@@ -15,4 +16,4 @@ const prisma = new PrismaClient({
   },
 })
 
-export { prisma, root, account, session, resume, profile, link, section }
+export { prisma, root, account, session, resume, profile, link, section, entry }

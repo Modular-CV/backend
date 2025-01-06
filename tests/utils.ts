@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker/.'
-import { Prisma } from '@prisma/client'
+import { EntryType, Prisma } from '@prisma/client'
 import { prisma } from '../src/controllers'
 import { hashString } from '../src/utils'
 
@@ -28,6 +28,13 @@ export const generateResumeInput = () => {
   })
 
   return resume
+}
+
+export const generateSectionInput = (entryType?: EntryType) => {
+  return Prisma.validator<Prisma.SectionCreateInput>()({
+    title: faker.book.title(),
+    entryType: entryType ?? faker.helpers.enumValue(EntryType),
+  })
 }
 
 export const createAccount = async (account: Prisma.AccountCreateInput) => {
