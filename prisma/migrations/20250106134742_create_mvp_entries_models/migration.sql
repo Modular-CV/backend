@@ -75,6 +75,15 @@ CREATE TABLE "EntryLocation" (
 );
 
 -- CreateTable
+CREATE TABLE "EntryDate" (
+    "id" TEXT NOT NULL,
+    "entryStartDateId" TEXT NOT NULL,
+    "entryEndDateId" TEXT NOT NULL,
+
+    CONSTRAINT "EntryDate_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "EntryStartDate" (
     "id" TEXT NOT NULL,
     "date" TIMESTAMP(3),
@@ -93,15 +102,6 @@ CREATE TABLE "EntryEndDate" (
     "isOnlyYear" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "EntryEndDate_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "EntryDate" (
-    "id" TEXT NOT NULL,
-    "entryStartDateId" TEXT NOT NULL,
-    "entryEndDateId" TEXT NOT NULL,
-
-    CONSTRAINT "EntryDate_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable

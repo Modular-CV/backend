@@ -148,6 +148,21 @@ model EntryLocation {
   CustomEntry                 CustomEntry?
 }
 
+model EntryDate {
+  id               String @id @default(cuid())
+  entryStartDateId String @unique
+  entryEndDateId   String @unique
+
+  EntryStartDate EntryStartDate @relation(fields: [entryStartDateId], references: [id], onDelete: Cascade)
+  EntryEndDate   EntryEndDate   @relation(fields: [entryEndDateId], references: [id], onDelete: Cascade)
+
+  EducationEntry              EducationEntry?
+  ProfessionalExperienceEntry ProfessionalExperienceEntry?
+  ProjectEntry                ProjectEntry?
+  CourseEntry                 CourseEntry?
+  CustomEntry                 CustomEntry?
+}
+
 model EntryStartDate {
   id         String    @id @default(cuid())
   date       DateTime?
@@ -165,21 +180,6 @@ model EntryEndDate {
   isOnlyYear    Boolean   @default(false)
 
   EntryDate EntryDate?
-}
-
-model EntryDate {
-  id               String @id @default(cuid())
-  entryStartDateId String @unique
-  entryEndDateId   String @unique
-
-  EntryStartDate EntryStartDate @relation(fields: [entryStartDateId], references: [id], onDelete: Cascade)
-  EntryEndDate   EntryEndDate   @relation(fields: [entryEndDateId], references: [id], onDelete: Cascade)
-
-  EducationEntry              EducationEntry?
-  ProfessionalExperienceEntry ProfessionalExperienceEntry?
-  ProjectEntry                ProjectEntry?
-  CourseEntry                 CourseEntry?
-  CustomEntry                 CustomEntry?
 }
 
 model EducationEntry {
@@ -239,7 +239,7 @@ model CourseEntry {
   description     String?
 
   Entry         Entry         @relation(fields: [entryId], references: [id], onDelete: Cascade)
-  LocationEntry EntryLocation @relation(fields: [entryLocationId], references: [id], onDelete: Cascade)
+  EntryLocation EntryLocation @relation(fields: [entryLocationId], references: [id], onDelete: Cascade)
   EntryDate     EntryDate     @relation(fields: [entryDateId], references: [id], onDelete: Cascade)
   Link          Link?         @relation(fields: [linkId], references: [id], onDelete: Cascade)
 }
@@ -255,7 +255,7 @@ model CustomEntry {
   description     String?
 
   Entry         Entry         @relation(fields: [entryId], references: [id], onDelete: Cascade)
-  LocationEntry EntryLocation @relation(fields: [entryLocationId], references: [id], onDelete: Cascade)
+  EntryLocation EntryLocation @relation(fields: [entryLocationId], references: [id], onDelete: Cascade)
   EntryDate     EntryDate     @relation(fields: [entryDateId], references: [id], onDelete: Cascade)
   Link          Link?         @relation(fields: [linkId], references: [id], onDelete: Cascade)
 }
