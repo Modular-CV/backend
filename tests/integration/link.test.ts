@@ -27,9 +27,10 @@ describe('GET ' + Route.myLinks, () => {
 
 describe('POST ' + Route.myLinks, () => {
   test('should return status 200 and the link id', async () => {
-    const linkInput = Prisma.validator<Prisma.LinkCreateWithoutAccountInput>()({
-      url: faker.internet.url(),
-    })
+    const linkInput =
+      Prisma.validator<Prisma.LinkUncheckedCreateWithoutAccountInput>()({
+        url: faker.internet.url(),
+      })
 
     const response = await request.post(Route.myLinks).send(linkInput)
 

@@ -67,7 +67,7 @@ export const post: RequestHandler = async ({ body }, response) => {
   const validatorObject = z.object({
     email: z.string().email(),
     password: z.string().min(4),
-  }) satisfies z.Schema<Prisma.AccountCreateInput>
+  }) satisfies z.Schema<Prisma.AccountUncheckedCreateInput>
 
   const validator = validatorObject.safeParse(body)
 

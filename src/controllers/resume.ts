@@ -27,7 +27,7 @@ export const postMyResume: RequestHandler = async (
 ) => {
   const validatorObject = z.object({
     title: z.string(),
-  }) satisfies z.Schema<Prisma.ResumeCreateWithoutAccountInput>
+  }) satisfies z.Schema<Prisma.ResumeUncheckedCreateWithoutAccountInput>
 
   const validator = validatorObject.safeParse(body)
 

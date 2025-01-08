@@ -25,7 +25,7 @@ export const postMySection: RequestHandler = async (
   const validatorObject = z.object({
     title: z.string(),
     entryType: z.nativeEnum(EntryType),
-  }) satisfies z.Schema<Prisma.SectionCreateWithoutAccountInput>
+  }) satisfies z.Schema<Prisma.SectionUncheckedCreateWithoutAccountInput>
 
   const validator = validatorObject.safeParse(body)
 

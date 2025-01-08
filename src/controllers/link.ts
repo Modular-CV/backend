@@ -24,7 +24,7 @@ export const postMyLink: RequestHandler = async (
 ) => {
   const validatorObject = z.object({
     url: z.string(),
-  }) satisfies z.Schema<Prisma.LinkCreateWithoutAccountInput>
+  }) satisfies z.Schema<Prisma.LinkUncheckedCreateWithoutAccountInput>
 
   const validator = validatorObject.safeParse(body)
 

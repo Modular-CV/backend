@@ -28,7 +28,7 @@ describe('GET' + Route.myProfiles, () => {
 describe('POST' + Route.myProfiles, () => {
   test('should return status 200 and the profile with id', async () => {
     const profileInput =
-      Prisma.validator<Prisma.ProfileCreateWithoutAccountInput>()({
+      Prisma.validator<Prisma.ProfileUncheckedCreateWithoutAccountInput>()({
         fullName: faker.person.fullName(),
         jobTitle: faker.person.jobTitle(),
         email: faker.internet.email(),

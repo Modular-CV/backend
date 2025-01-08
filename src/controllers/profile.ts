@@ -36,7 +36,7 @@ export const postMyProfile: RequestHandler = async (
 
   const validatorObject = z.object(
     inputs,
-  ) satisfies z.Schema<Prisma.ProfileCreateWithoutAccountInput>
+  ) satisfies z.Schema<Prisma.ProfileUncheckedCreateWithoutAccountInput>
 
   const validator = validatorObject.safeParse(body)
 

@@ -31,13 +31,15 @@ export const generateResumeInput = () => {
 }
 
 export const generateSectionInput = (entryType?: EntryType) => {
-  return Prisma.validator<Prisma.SectionCreateInput>()({
+  return Prisma.validator<Prisma.SectionUncheckedCreateInput>()({
     title: faker.book.title(),
     entryType: entryType ?? faker.helpers.enumValue(EntryType),
   })
 }
 
-export const createAccount = async (account: Prisma.AccountCreateInput) => {
+export const createAccount = async (
+  account: Prisma.AccountUncheckedCreateInput,
+) => {
   return await prisma.account.create({
     data: {
       email: account.email,
