@@ -10,7 +10,6 @@ export const pascalToCamel = (key: string): string => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const normalizeOutput = (object: Record<string, any>) => {
-  console.log(object)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const output: Record<string, any> = {}
 

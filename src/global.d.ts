@@ -2,7 +2,7 @@ import * as core from 'express-serve-static-core'
 import { RequestHandler as ExpressRequestHandler } from 'express'
 import { ZodIssue } from 'zod'
 import { ErrorCode } from './types'
-import { Account } from '@prisma/client'
+import { Account, type EntryType } from '@prisma/client'
 import { JwtPayload } from 'jsonwebtoken'
 import { Route } from './types'
 import TestAgent from 'supertest/lib/agent'
@@ -10,10 +10,13 @@ import { Test } from 'supertest'
 import { Prisma } from '@prisma/client'
 
 declare global {
-  type EntryUncheckedCreateInput = Omit<
+  type EntryUncheckedCreateInput<T extends EntryType = EntryType> = Omit<
     Prisma.EntryUncheckedCreateInput,
     'sectionId'
-  >
+  > &
+    Required<Pick<Prisma.EntryUncheckedCreateInput, 'entryType'>> & {
+      entryType: T
+    }
 
   type EntryDateUncheckedCreateInput = Omit<
     Prisma.EntryDateUncheckedCreateInput,
@@ -25,46 +28,58 @@ declare global {
 
   type EntryUncheckedCreateInputWithLocationAndDate = {
     entryLocation: Prisma.EntryLocationUncheckedCreateInput
-  } & {
     entryDate: EntryDateUncheckedCreateInput
   }
 
-  type SkillEntryUncheckedCreateInput = EntryUncheckedCreateInput &
-    Omit<Prisma.SkillEntryUncheckedCreateInput, 'entryId'>
+  type SkillEntryUncheckedCreateInput = EntryUncheckedCreateInput<'SKILL'> & {
+    skillEntry: Omit<Prisma.SkillEntryUncheckedCreateInput, 'entryId'>
+  }
 
-  type ProjectEntryUncheckedCreateInput = EntryUncheckedCreateInput &
-    Omit<Prisma.ProjectEntryUncheckedCreateInput, 'entryId' | 'entryDateId'> & {
-      entryDate: EntryDateUncheckedCreateInput
+  type ProjectEntryUncheckedCreateInput =
+    EntryUncheckedCreateInput<'PROJECT'> & {
+      projectEntry: Omit<
+        Prisma.ProjectEntryUncheckedCreateInput,
+        'entryId' | 'entryDateId'
+      > & {
+        entryDate: EntryDateUncheckedCreateInput
+      }
     }
 
   type ProfessionalExperienceEntryUncheckedCreateInput =
-    EntryUncheckedCreateInput &
-      Omit<
+    EntryUncheckedCreateInput<'PROFESSIONAL_EXPERIENCE'> & {
+      entryType: typeof EntryType.PROFESSIONAL_EXPERIENCE
+    } & {
+      professionalExperienceEntry: Omit<
         Prisma.ProfessionalExperienceEntryUncheckedCreateInput,
         'entryId' | 'entryLocationId' | 'entryDateId'
       > &
-      EntryUncheckedCreateInputWithLocationAndDate
+        EntryUncheckedCreateInputWithLocationAndDate
+    }
 
-  type EducationEntryUncheckedCreateInput = EntryUncheckedCreateInput &
-    Omit<
-      Prisma.EducationEntryUncheckedCreateInput,
-      'entryId' | 'entryLocationId' | 'entryDateId'
-    > &
-    EntryUncheckedCreateInputWithLocationAndDate
+  type EducationEntryUncheckedCreateInput =
+    EntryUncheckedCreateInput<'EDUCATION'> & {
+      educationEntry: Omit<
+        Prisma.EducationEntryUncheckedCreateInput,
+        'entryId' | 'entryLocationId' | 'entryDateId'
+      > &
+        EntryUncheckedCreateInputWithLocationAndDate
+    }
 
-  type CourseEntryUncheckedCreateInput = EntryUncheckedCreateInput &
-    Omit<
+  type CourseEntryUncheckedCreateInput = EntryUncheckedCreateInput<'COURSE'> & {
+    courseEntry: Omit<
       Prisma.CourseEntryUncheckedCreateInput,
       'entryId' | 'entryLocationId' | 'entryDateId'
     > &
-    EntryUncheckedCreateInputWithLocationAndDate
+      EntryUncheckedCreateInputWithLocationAndDate
+  }
 
-  type CustomEntryUncheckedCreateInput = EntryUncheckedCreateInput &
-    Omit<
+  type CustomEntryUncheckedCreateInput = EntryUncheckedCreateInput<'CUSTOM'> & {
+    customEntry: Omit<
       Prisma.CustomEntryUncheckedCreateInput,
       'entryId' | 'entryLocationId' | 'entryDateId'
     > &
-    EntryUncheckedCreateInputWithLocationAndDate
+      EntryUncheckedCreateInputWithLocationAndDate
+  }
 
   type ParsedRoute = string & { __brand: 'ParsedRoute' }
 

@@ -53,6 +53,13 @@ export const postMySectionEntry: RequestHandler = async (
     return
   }
 
+  const entryType = section.entryType
+
+  const validatorEntryObject = z.object({
+    isVisible: z.boolean().optional(),
+    entryType: z.literal(entryType),
+  }) satisfies z.Schema<EntryUncheckedCreateInput>
+
   const validatorEntryLocationObject = z.object({
     city: z.string().optional(),
     country: z.string().optional(),
@@ -76,87 +83,94 @@ export const postMySectionEntry: RequestHandler = async (
     entryEndDate: validatorEntryEndDateObject,
   }) satisfies z.Schema<EntryDateUncheckedCreateInput>
 
-  const entryType = section.entryType
-
   let validatorObject
 
   switch (entryType) {
     case 'SKILL': {
-      validatorObject = z.object({
-        isVisible: z.boolean().optional(),
+      validatorObject = validatorEntryObject.extend({
         entryType: z.literal(entryType),
-        name: z.string(),
-        information: z.string().optional(),
-        skillLevel: z.nativeEnum(SkillLevel).optional(),
+        skillEntry: z.object({
+          name: z.string(),
+          information: z.string().optional(),
+          skillLevel: z.nativeEnum(SkillLevel).optional(),
+        }),
       }) satisfies z.Schema<SkillEntryUncheckedCreateInput>
 
       break
     }
     case 'PROJECT': {
-      validatorObject = z.object({
-        isVisible: z.boolean().optional(),
+      validatorObject = validatorEntryObject.extend({
         entryType: z.literal(entryType),
-        linkId: z.string().cuid().optional(),
-        title: z.string(),
-        subTitle: z.string().optional(),
-        description: z.string().optional(),
-        entryDate: validatorEntryDateObject,
+        projectEntry: z.object({
+          linkId: z.string().cuid().optional(),
+          title: z.string(),
+          subTitle: z.string().optional(),
+          description: z.string().optional(),
+          entryDate: validatorEntryDateObject,
+        }),
       }) satisfies z.Schema<ProjectEntryUncheckedCreateInput>
 
       break
     }
+
     case 'PROFESSIONAL_EXPERIENCE': {
-      validatorObject = z.object({
-        isVisible: z.boolean().optional(),
+      validatorObject = validatorEntryObject.extend({
         entryType: z.literal(entryType),
-        linkId: z.string().cuid().optional(),
-        jobTitle: z.string().optional(),
-        employer: z.string().optional(),
-        description: z.string().optional(),
-        entryLocation: validatorEntryLocationObject,
-        entryDate: validatorEntryDateObject,
+        professionalExperienceEntry: z
+          .object({
+            linkId: z.string().cuid().optional(),
+            jobTitle: z.string().optional(),
+            employer: z.string().optional(),
+            description: z.string().optional(),
+            entryLocation: validatorEntryLocationObject,
+            entryDate: validatorEntryDateObject,
+          })
+          .merge(validatorEntryEndDateObject),
       }) satisfies z.Schema<ProfessionalExperienceEntryUncheckedCreateInput>
 
       break
     }
     case 'EDUCATION': {
-      validatorObject = z.object({
-        isVisible: z.boolean().optional(),
+      validatorObject = validatorEntryObject.extend({
         entryType: z.literal(entryType),
-        linkId: z.string().cuid().optional(),
-        school: z.string().optional(),
-        degree: z.string().optional(),
-        description: z.string().optional(),
-        entryLocation: validatorEntryLocationObject,
-        entryDate: validatorEntryDateObject,
+        educationEntry: z.object({
+          linkId: z.string().cuid().optional(),
+          school: z.string().optional(),
+          degree: z.string().optional(),
+          description: z.string().optional(),
+          entryLocation: validatorEntryLocationObject,
+          entryDate: validatorEntryDateObject,
+        }),
       }) satisfies z.Schema<EducationEntryUncheckedCreateInput>
 
       break
     }
     case 'COURSE': {
-      validatorObject = z.object({
-        isVisible: z.boolean().optional(),
+      validatorObject = validatorEntryObject.extend({
         entryType: z.literal(entryType),
-        linkId: z.string().cuid().optional(),
-        title: z.string(),
-        institution: z.string().optional(),
-        description: z.string().optional(),
-        entryLocation: validatorEntryLocationObject,
-        entryDate: validatorEntryDateObject,
+        courseEntry: z.object({
+          linkId: z.string().cuid().optional(),
+          title: z.string(),
+          institution: z.string().optional(),
+          description: z.string().optional(),
+          entryLocation: validatorEntryLocationObject,
+          entryDate: validatorEntryDateObject,
+        }),
       }) satisfies z.Schema<CourseEntryUncheckedCreateInput>
 
       break
     }
     case 'CUSTOM': {
-      validatorObject = z.object({
-        isVisible: z.boolean().optional(),
+      validatorObject = validatorEntryObject.extend({
         entryType: z.literal(entryType),
-        linkId: z.string().cuid().optional(),
-        title: z.string().optional(),
-        subTitle: z.string().optional(),
-        description: z.string().optional(),
-        entryLocation: validatorEntryLocationObject,
-        entryDate: validatorEntryDateObject,
+        customEntry: z.object({
+          linkId: z.string().cuid().optional(),
+          title: z.string().optional(),
+          subTitle: z.string().optional(),
+          description: z.string().optional(),
+          entryLocation: validatorEntryLocationObject,
+          entryDate: validatorEntryDateObject,
+        }),
       }) satisfies z.Schema<CustomEntryUncheckedCreateInput>
 
       break
@@ -178,22 +192,37 @@ export const postMySectionEntry: RequestHandler = async (
     return
   }
 
+  /**
+   * Returns the link id or null
+   */
+  const validateLinkId = async (id?: string | null): Promise<string | null> => {
+    if (!id) return null
+
+    const link = await prisma.link.findUnique({
+      where: {
+        id,
+      },
+    })
+
+    return link ? link.id : null
+  }
+
   let entryArgs: Prisma.EntryCreateArgs
 
   switch (entryType) {
     case 'SKILL': {
-      const data = validator.data as SkillEntryUncheckedCreateInput
+      const entry = validator.data as SkillEntryUncheckedCreateInput
 
       entryArgs = {
         data: {
           sectionId,
-          isVisible: data.isVisible,
-          entryType: data.entryType,
+          isVisible: entry.isVisible,
+          entryType: entry.entryType,
           SkillEntry: {
             create: {
-              name: data.name,
-              information: data.information,
-              skillLevel: data.skillLevel,
+              name: entry.skillEntry.name,
+              information: entry.skillEntry.information,
+              skillLevel: entry.skillEntry.skillLevel,
             },
           },
         },
@@ -204,33 +233,38 @@ export const postMySectionEntry: RequestHandler = async (
       break
     }
     case 'PROJECT': {
-      const data = validator.data as ProjectEntryUncheckedCreateInput
+      const entry = validator.data as ProjectEntryUncheckedCreateInput
 
       entryArgs = {
         data: {
           sectionId,
-          isVisible: data.isVisible,
-          entryType: data.entryType,
+          isVisible: entry.isVisible,
+          entryType: entry.entryType,
           ProjectEntry: {
             create: {
-              title: data.title,
-              description: data.description,
-              subtitle: data.subtitle,
+              title: entry.projectEntry.title,
+              description: entry.projectEntry.description,
+              subtitle: entry.projectEntry.subtitle,
               EntryDate: {
                 create: {
                   EntryStartDate: {
                     create: {
-                      date: data.entryDate.entryStartDate.date,
-                      isOnlyYear: data.entryDate.entryStartDate.isOnlyYear,
-                      isVisible: data.entryDate.entryStartDate.isVisible,
+                      date: entry.projectEntry.entryDate.entryStartDate.date,
+                      isOnlyYear:
+                        entry.projectEntry.entryDate.entryStartDate.isOnlyYear,
+                      isVisible:
+                        entry.projectEntry.entryDate.entryStartDate.isVisible,
                     },
                   },
                   EntryEndDate: {
                     create: {
-                      date: data.entryDate.entryEndDate.date,
-                      isCurrentDate: data.entryDate.entryEndDate.isCurrentDate,
-                      isOnlyYear: data.entryDate.entryEndDate.isOnlyYear,
-                      isVisible: data.entryDate.entryEndDate.isVisible,
+                      date: entry.projectEntry.entryDate.entryEndDate.date,
+                      isCurrentDate:
+                        entry.projectEntry.entryDate.entryEndDate.isCurrentDate,
+                      isOnlyYear:
+                        entry.projectEntry.entryDate.entryEndDate.isOnlyYear,
+                      isVisible:
+                        entry.projectEntry.entryDate.entryEndDate.isVisible,
                     },
                   },
                 },
@@ -247,60 +281,68 @@ export const postMySectionEntry: RequestHandler = async (
         },
       }
 
-      if (data.linkId) {
-        const link = await prisma.link.findUnique({
-          where: {
-            id: data.linkId,
-          },
-        })
+      const linkId = await validateLinkId(entry.projectEntry.linkId)
 
-        if (link)
-          entryArgs.data.ProjectEntry!.create!.Link = {
-            connect: {
-              id: link.id,
-            },
-          }
+      if (linkId) {
+        entryArgs.data.ProjectEntry!.create!.Link = {
+          connect: {
+            id: linkId,
+          },
+        }
       }
 
       break
     }
     case 'PROFESSIONAL_EXPERIENCE': {
-      const data =
+      const entry =
         validator.data as ProfessionalExperienceEntryUncheckedCreateInput
 
       entryArgs = {
         data: {
           sectionId,
-          isVisible: data.isVisible,
-          entryType: data.entryType,
+          isVisible: entry.isVisible,
+          entryType: entry.entryType,
           ProfessionalExperienceEntry: {
             create: {
-              description: data.description,
-              employer: data.employer,
-              jobTitle: data.jobTitle,
+              description: entry.professionalExperienceEntry.description,
+              employer: entry.professionalExperienceEntry.employer,
+              jobTitle: entry.professionalExperienceEntry.jobTitle,
               EntryDate: {
                 create: {
                   EntryStartDate: {
                     create: {
-                      date: data.entryDate.entryStartDate.date,
-                      isOnlyYear: data.entryDate.entryStartDate.isOnlyYear,
-                      isVisible: data.entryDate.entryStartDate.isVisible,
+                      date: entry.professionalExperienceEntry.entryDate
+                        .entryStartDate.date,
+                      isOnlyYear:
+                        entry.professionalExperienceEntry.entryDate
+                          .entryStartDate.isOnlyYear,
+                      isVisible:
+                        entry.professionalExperienceEntry.entryDate
+                          .entryStartDate.isVisible,
                     },
                   },
                   EntryEndDate: {
                     create: {
-                      date: data.entryDate.entryEndDate.date,
-                      isCurrentDate: data.entryDate.entryEndDate.isCurrentDate,
-                      isOnlyYear: data.entryDate.entryEndDate.isOnlyYear,
-                      isVisible: data.entryDate.entryEndDate.isVisible,
+                      date: entry.professionalExperienceEntry.entryDate
+                        .entryEndDate.date,
+                      isCurrentDate:
+                        entry.professionalExperienceEntry.entryDate.entryEndDate
+                          .isCurrentDate,
+                      isOnlyYear:
+                        entry.professionalExperienceEntry.entryDate.entryEndDate
+                          .isOnlyYear,
+                      isVisible:
+                        entry.professionalExperienceEntry.entryDate.entryEndDate
+                          .isVisible,
                     },
                   },
                 },
               },
               EntryLocation: {
                 create: {
-                  city: data.entryLocation.city,
-                  country: data.entryLocation.country,
+                  city: entry.professionalExperienceEntry.entryLocation.city,
+                  country:
+                    entry.professionalExperienceEntry.entryLocation.country,
                 },
               },
             },
@@ -321,56 +363,60 @@ export const postMySectionEntry: RequestHandler = async (
         },
       }
 
-      if (data.linkId) {
-        const link = await prisma.link.findUnique({
-          where: {
-            id: data.linkId,
-          },
-        })
+      const linkId = await validateLinkId(
+        entry.professionalExperienceEntry.linkId,
+      )
 
-        if (link)
-          entryArgs.data.ProjectEntry!.create!.Link = {
-            connect: {
-              id: link.id,
-            },
-          }
+      if (linkId) {
+        entryArgs.data.ProfessionalExperienceEntry!.create!.Link = {
+          connect: {
+            id: linkId,
+          },
+        }
       }
       break
     }
     case 'EDUCATION': {
-      const data = validator.data as EducationEntryUncheckedCreateInput
+      const entry = validator.data as EducationEntryUncheckedCreateInput
 
       entryArgs = {
         data: {
           sectionId,
-          entryType: data.entryType,
-          isVisible: data.isVisible,
+          entryType: entry.entryType,
+          isVisible: entry.isVisible,
           EducationEntry: {
             create: {
-              degree: data.degree,
-              description: data.description,
-              school: data.school,
+              degree: entry.educationEntry.degree,
+              description: entry.educationEntry.description,
+              school: entry.educationEntry.school,
               EntryLocation: {
                 create: {
-                  city: data.entryLocation.city,
-                  country: data.entryLocation.country,
+                  city: entry.educationEntry.entryLocation.city,
+                  country: entry.educationEntry.entryLocation.country,
                 },
               },
               EntryDate: {
                 create: {
                   EntryStartDate: {
                     create: {
-                      date: data.entryDate.entryStartDate.date,
-                      isOnlyYear: data.entryDate.entryStartDate.isOnlyYear,
-                      isVisible: data.entryDate.entryEndDate.isVisible,
+                      date: entry.educationEntry.entryDate.entryStartDate.date,
+                      isOnlyYear:
+                        entry.educationEntry.entryDate.entryStartDate
+                          .isOnlyYear,
+                      isVisible:
+                        entry.educationEntry.entryDate.entryEndDate.isVisible,
                     },
                   },
                   EntryEndDate: {
                     create: {
-                      date: data.entryDate.entryEndDate.date,
-                      isCurrentDate: data.entryDate.entryEndDate.isCurrentDate,
-                      isOnlyYear: data.entryDate.entryEndDate.isOnlyYear,
-                      isVisible: data.entryDate.entryEndDate.isVisible,
+                      date: entry.educationEntry.entryDate.entryEndDate.date,
+                      isCurrentDate:
+                        entry.educationEntry.entryDate.entryEndDate
+                          .isCurrentDate,
+                      isOnlyYear:
+                        entry.educationEntry.entryDate.entryEndDate.isOnlyYear,
+                      isVisible:
+                        entry.educationEntry.entryDate.entryEndDate.isVisible,
                     },
                   },
                 },
@@ -393,56 +439,56 @@ export const postMySectionEntry: RequestHandler = async (
         },
       }
 
-      if (data.linkId) {
-        const link = await prisma.link.findUnique({
-          where: {
-            id: data.linkId,
-          },
-        })
+      const linkId = await validateLinkId(entry.educationEntry.linkId)
 
-        if (link)
-          entryArgs.data.ProjectEntry!.create!.Link = {
-            connect: {
-              id: link.id,
-            },
-          }
+      if (linkId) {
+        entryArgs.data.EducationEntry!.create!.Link = {
+          connect: {
+            id: linkId,
+          },
+        }
       }
       break
     }
     case 'COURSE': {
-      const data = validator.data as CourseEntryUncheckedCreateInput
+      const entry = validator.data as CourseEntryUncheckedCreateInput
 
       entryArgs = {
         data: {
           sectionId,
-          entryType: data.entryType,
-          isVisible: data.isVisible,
+          entryType: entry.entryType,
+          isVisible: entry.isVisible,
           CourseEntry: {
             create: {
-              title: data.title,
-              description: data.description,
-              institution: data.institution,
+              title: entry.courseEntry.title,
+              description: entry.courseEntry.description,
+              institution: entry.courseEntry.institution,
               EntryLocation: {
                 create: {
-                  city: data.entryLocation.city,
-                  country: data.entryLocation.country,
+                  city: entry.courseEntry.entryLocation.city,
+                  country: entry.courseEntry.entryLocation.country,
                 },
               },
               EntryDate: {
                 create: {
                   EntryStartDate: {
                     create: {
-                      date: data.entryDate.entryStartDate.date,
-                      isOnlyYear: data.entryDate.entryStartDate.isOnlyYear,
-                      isVisible: data.entryDate.entryEndDate.isVisible,
+                      date: entry.courseEntry.entryDate.entryStartDate.date,
+                      isOnlyYear:
+                        entry.courseEntry.entryDate.entryStartDate.isOnlyYear,
+                      isVisible:
+                        entry.courseEntry.entryDate.entryEndDate.isVisible,
                     },
                   },
                   EntryEndDate: {
                     create: {
-                      date: data.entryDate.entryEndDate.date,
-                      isCurrentDate: data.entryDate.entryEndDate.isCurrentDate,
-                      isOnlyYear: data.entryDate.entryEndDate.isOnlyYear,
-                      isVisible: data.entryDate.entryEndDate.isVisible,
+                      date: entry.courseEntry.entryDate.entryEndDate.date,
+                      isCurrentDate:
+                        entry.courseEntry.entryDate.entryEndDate.isCurrentDate,
+                      isOnlyYear:
+                        entry.courseEntry.entryDate.entryEndDate.isOnlyYear,
+                      isVisible:
+                        entry.courseEntry.entryDate.entryEndDate.isVisible,
                     },
                   },
                 },
@@ -465,56 +511,56 @@ export const postMySectionEntry: RequestHandler = async (
         },
       }
 
-      if (data.linkId) {
-        const link = await prisma.link.findUnique({
-          where: {
-            id: data.linkId,
-          },
-        })
+      const linkId = await validateLinkId(entry.courseEntry.linkId)
 
-        if (link)
-          entryArgs.data.ProjectEntry!.create!.Link = {
-            connect: {
-              id: link.id,
-            },
-          }
+      if (linkId) {
+        entryArgs.data.CourseEntry!.create!.Link = {
+          connect: {
+            id: linkId,
+          },
+        }
       }
       break
     }
     case 'CUSTOM': {
-      const data = validator.data as CustomEntryUncheckedCreateInput
+      const entry = validator.data as CustomEntryUncheckedCreateInput
 
       entryArgs = {
         data: {
           sectionId,
-          entryType: data.entryType,
-          isVisible: data.isVisible,
+          entryType: entry.entryType,
+          isVisible: entry.isVisible,
           CustomEntry: {
             create: {
-              description: data.description,
-              subtitle: data.subtitle,
-              title: data.title,
+              description: entry.customEntry.description,
+              subtitle: entry.customEntry.subtitle,
+              title: entry.customEntry.title,
               EntryLocation: {
                 create: {
-                  city: data.entryLocation.city,
-                  country: data.entryLocation.country,
+                  city: entry.customEntry.entryLocation.city,
+                  country: entry.customEntry.entryLocation.country,
                 },
               },
               EntryDate: {
                 create: {
                   EntryStartDate: {
                     create: {
-                      date: data.entryDate.entryStartDate.date,
-                      isOnlyYear: data.entryDate.entryStartDate.isOnlyYear,
-                      isVisible: data.entryDate.entryEndDate.isVisible,
+                      date: entry.customEntry.entryDate.entryStartDate.date,
+                      isOnlyYear:
+                        entry.customEntry.entryDate.entryStartDate.isOnlyYear,
+                      isVisible:
+                        entry.customEntry.entryDate.entryEndDate.isVisible,
                     },
                   },
                   EntryEndDate: {
                     create: {
-                      date: data.entryDate.entryEndDate.date,
-                      isCurrentDate: data.entryDate.entryEndDate.isCurrentDate,
-                      isOnlyYear: data.entryDate.entryEndDate.isOnlyYear,
-                      isVisible: data.entryDate.entryEndDate.isVisible,
+                      date: entry.customEntry.entryDate.entryEndDate.date,
+                      isCurrentDate:
+                        entry.customEntry.entryDate.entryEndDate.isCurrentDate,
+                      isOnlyYear:
+                        entry.customEntry.entryDate.entryEndDate.isOnlyYear,
+                      isVisible:
+                        entry.customEntry.entryDate.entryEndDate.isVisible,
                     },
                   },
                 },
@@ -537,19 +583,14 @@ export const postMySectionEntry: RequestHandler = async (
         },
       }
 
-      if (data.linkId) {
-        const link = await prisma.link.findUnique({
-          where: {
-            id: data.linkId,
-          },
-        })
+      const linkId = await validateLinkId(entry.customEntry.linkId)
 
-        if (link)
-          entryArgs.data.ProjectEntry!.create!.Link = {
-            connect: {
-              id: link.id,
-            },
-          }
+      if (linkId) {
+        entryArgs.data.CustomEntry!.create!.Link = {
+          connect: {
+            id: linkId,
+          },
+        }
       }
       break
     }
