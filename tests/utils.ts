@@ -3,6 +3,29 @@ import { EntryType, Prisma } from '@prisma/client'
 import { prisma } from '../src/controllers'
 import { hashString } from '../src/utils'
 
+export const generateEntryDateInput = () => {
+  return Prisma.validator<EntryDateUncheckedCreateInput>()({
+    entryStartDate: {
+      date: faker.date.past(),
+      isVisible: faker.datatype.boolean(),
+      isOnlyYear: faker.datatype.boolean(),
+    },
+    entryEndDate: {
+      date: faker.date.past(),
+      isVisible: faker.datatype.boolean(),
+      isOnlyYear: faker.datatype.boolean(),
+      isCurrentDate: faker.datatype.boolean(),
+    },
+  })
+}
+
+export const generateEntryLocationInput = () => {
+  return Prisma.validator<Prisma.EntryLocationUncheckedCreateInput>()({
+    city: faker.location.city(),
+    country: faker.location.country(),
+  })
+}
+
 export const generateAccountInput = () => {
   const account = Prisma.validator(
     prisma,
