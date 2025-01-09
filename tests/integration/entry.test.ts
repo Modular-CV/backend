@@ -8,7 +8,7 @@ import {
 import { Route } from '../../src/types'
 import { routeParser } from '../../src/utils'
 import { faker } from '@faker-js/faker/.'
-import { Prisma, Section } from '@prisma/client'
+import { Section, SkillLevel } from '@prisma/client'
 
 const serverInstance = server.listen()
 const request = supertest.agent(serverInstance)
@@ -41,6 +41,35 @@ describe('GET ' + Route.mySectionEntries, () => {
 })
 
 describe('POST ' + Route.mySectionEntries, () => {
+  test('should return status 200 and the skill id', async () => {
+    const sectionInput = generateSectionInput('SKILL')
+    const sectionResponse = await request
+      .post(Route.mySections)
+      .send(sectionInput)
+
+    const section: Section = sectionResponse.body.data.section
+
+    const skillEntryInput: SkillEntryUncheckedCreateInput = {
+      entryType: 'SKILL',
+      isVisible: true,
+      skillEntry: {
+        name: faker.person.jobArea(),
+        information: faker.person.jobDescriptor(),
+        skillLevel: faker.helpers.enumValue(SkillLevel),
+      },
+    }
+
+    const entryResponse = await request
+      .post(routeParser(Route.mySectionEntries, ':sectionId', section.id))
+      .send(skillEntryInput)
+
+    expect(entryResponse.status).toBe(200)
+
+    const entry = entryResponse.body.data.entry
+
+    expect(entry.id).toBeTruthy()
+  })
+
   test('should return status 200 and the course entry id', async () => {
     const sectionInput = generateSectionInput('COURSE')
     const sectionResponse = await request
@@ -49,28 +78,29 @@ describe('POST ' + Route.mySectionEntries, () => {
 
     const section: Section = sectionResponse.body.data.section
 
-    const courseEntryInput: Prisma.EntryCreateWithoutSectionInput &
-      CourseEntryUncheckedCreateInput = {
+    const courseEntryInput: CourseEntryUncheckedCreateInput = {
       entryType: 'COURSE',
       isVisible: true,
-      title: faker.book.title(),
-      institution: faker.company.name(),
-      description: faker.lorem.sentence(),
-      entryLocation: {
-        city: faker.location.city(),
-        country: faker.location.country(),
-      },
-      entryDate: {
-        entryStartDate: {
-          date: faker.date.past(),
-          isVisible: faker.datatype.boolean(),
-          isOnlyYear: faker.datatype.boolean(),
+      courseEntry: {
+        title: faker.book.title(),
+        institution: faker.company.name(),
+        description: faker.lorem.sentence(),
+        entryLocation: {
+          city: faker.location.city(),
+          country: faker.location.country(),
         },
-        entryEndDate: {
-          date: faker.date.past(),
-          isVisible: faker.datatype.boolean(),
-          isOnlyYear: faker.datatype.boolean(),
-          isCurrentDate: faker.datatype.boolean(),
+        entryDate: {
+          entryStartDate: {
+            date: faker.date.past(),
+            isVisible: faker.datatype.boolean(),
+            isOnlyYear: faker.datatype.boolean(),
+          },
+          entryEndDate: {
+            date: faker.date.past(),
+            isVisible: faker.datatype.boolean(),
+            isOnlyYear: faker.datatype.boolean(),
+            isCurrentDate: faker.datatype.boolean(),
+          },
         },
       },
     }
