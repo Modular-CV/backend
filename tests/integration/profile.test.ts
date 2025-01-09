@@ -1,9 +1,9 @@
 import supertest from 'supertest'
-import server from '../../src/server'
-import { createAccount, generateAccountInput } from '../utils'
+import server from '../../src/server.ts'
+import { createAccount, generateAccountInput } from '../utils.ts'
 import { Prisma } from '@prisma/client'
-import { faker } from '@faker-js/faker/.'
-import { Route } from '../../src/types'
+import { faker } from '@faker-js/faker'
+import { Route } from '../../src/types.ts'
 
 const serverInstance = server.listen()
 const request = supertest.agent(serverInstance)

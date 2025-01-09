@@ -1,5 +1,5 @@
 import express from 'express'
-import * as routes from './routes'
+import * as routes from './routes.ts'
 import cookieParser from 'cookie-parser'
 
 const server = express()

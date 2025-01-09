@@ -1,7 +1,7 @@
-import { faker } from '@faker-js/faker/.'
+import { faker } from '@faker-js/faker'
 import { EntryType, Prisma } from '@prisma/client'
-import { prisma } from '../src/controllers'
-import { hashString } from '../src/utils'
+import { prisma } from '../src/controllers/index.ts'
+import { hashString } from '../src/utils.ts'
 
 export const generateEntryDateInput = () => {
   return Prisma.validator<EntryDateUncheckedCreateInput>()({

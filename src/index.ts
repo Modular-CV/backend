@@ -1,4 +1,4 @@
-import server from './server'
+import server from './server.ts'
 
 const serverListenMessage = () => {
   console.log(`\nServer is running on ${process.env.DOMAIN}\n`)

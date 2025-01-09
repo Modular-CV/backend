@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken'
 import nodemailer from 'nodemailer'
-import { MailOptions } from 'nodemailer/lib/sendmail-transport'
 import argon2 from 'argon2'
-import SMTPTransport from 'nodemailer/lib/smtp-transport'
+import type { MailOptions } from 'nodemailer/lib/sendmail-transport/index.js'
+import type SMTPTransport from 'nodemailer/lib/smtp-transport/index.js'
 
 export const pascalToCamel = (key: string): string => {
   return key.replace(/^([A-Z])/, (match) => match.toLowerCase())

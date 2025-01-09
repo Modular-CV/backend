@@ -1,7 +1,7 @@
 import { z } from 'zod'
-import { prisma } from '.'
+import { prisma } from './index.ts'
 import { EntryType, Prisma } from '@prisma/client'
-import { ErrorCode } from '../types'
+import { ErrorCode } from '../types.ts'
 
 export const getMySections: RequestHandler = ({ accessToken }, response) => {
   const sections = prisma.section.findMany({

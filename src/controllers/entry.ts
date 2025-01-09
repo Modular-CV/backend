@@ -1,8 +1,8 @@
 import { z } from 'zod'
-import { prisma } from '.'
-import { ErrorCode } from '../types'
+import { prisma } from './index.ts'
+import { ErrorCode } from '../types.ts'
 import { Prisma, SkillLevel } from '@prisma/client'
-import { normalizeOutput } from '../utils'
+import { normalizeOutput } from '../utils.ts'
 
 export const getMySectionEntries: RequestHandler = (
   { accessToken, params },

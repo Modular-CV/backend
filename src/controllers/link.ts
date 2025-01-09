@@ -1,7 +1,7 @@
 import { z } from 'zod'
-import { prisma } from '.'
+import { prisma } from './index.ts'
 import { Prisma } from '@prisma/client'
-import { ErrorCode } from '../types'
+import { ErrorCode } from '../types.ts'
 
 export const getMyLinks: RequestHandler = async ({ accessToken }, response) => {
   const links = await prisma.link.findMany({

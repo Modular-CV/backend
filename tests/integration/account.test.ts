@@ -1,8 +1,8 @@
 import supertest from 'supertest'
-import { prisma } from '../../src/controllers' // Prisma should be imported after Routes - I don't know why
-import server from '../../src/server'
-import { createAccount, generateAccountInput } from '../utils'
-import { Route } from '../../src/types'
+import { prisma } from '../../src/controllers/index.ts' // Prisma should be imported after Routes - I don't know why
+import server from '../../src/server.ts'
+import { createAccount, generateAccountInput } from '../utils.ts'
+import { Route } from '../../src/types.ts'
 
 const serverInstance = server.listen()
 const request = supertest.agent(serverInstance)

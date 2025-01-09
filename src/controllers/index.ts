@@ -1,12 +1,12 @@
 import { PrismaClient } from '@prisma/client'
-import * as root from './root'
-import * as account from './account'
-import * as session from './session'
-import * as resume from './resume'
-import * as profile from './profile'
-import * as link from './link'
-import * as section from './section'
-import * as entry from './entry'
+import * as root from './root.ts'
+import * as account from './account.ts'
+import * as session from './session.ts'
+import * as resume from './resume.ts'
+import * as profile from './profile.ts'
+import * as link from './link.ts'
+import * as section from './section.ts'
+import * as entry from './entry.ts'
 
 const prisma = new PrismaClient({
   omit: {

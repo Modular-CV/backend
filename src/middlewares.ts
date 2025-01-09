@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { ErrorCode } from './types'
+import { ErrorCode } from './types.ts'
 
 export const authenticateSessionToken: RequestHandler = (
   request,

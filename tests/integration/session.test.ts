@@ -1,8 +1,8 @@
-import { faker } from '@faker-js/faker/.'
+import { faker } from '@faker-js/faker'
 import supertest from 'supertest'
-import { generateAccountInput, createAccount, sleep } from '../utils'
-import server from '../../src/server'
-import { Route } from '../../src/types'
+import { generateAccountInput, createAccount, sleep } from '../utils.ts'
+import server from '../../src/server.ts'
+import { Route } from '../../src/types.ts'
 
 const serverInstance = server.listen()
 let request = supertest.agent(serverInstance)

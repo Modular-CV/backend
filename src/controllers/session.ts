@@ -1,10 +1,14 @@
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
-import { prisma } from '.'
-import { generateSessionToken, hashString, verifyHashedString } from '../utils'
-import { ErrorCode, Route } from '../types'
+import { prisma } from './index.ts'
+import {
+  generateSessionToken,
+  hashString,
+  verifyHashedString,
+} from '../utils.ts'
+import { ErrorCode, Route } from '../types.ts'
 import jwt from 'jsonwebtoken'
-import { Response } from 'express'
+import { type Response } from 'express'
 
 /**
  * This function will mutate the response object

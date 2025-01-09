@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client'
-import { prisma } from '.'
-import { hashString, routeParser, sendMail } from '../utils'
+import { prisma } from './index.ts'
+import { hashString, routeParser, sendMail } from '../utils.ts'
 import { z } from 'zod'
-import { ErrorCode, Route } from '../types'
+import { ErrorCode, Route } from '../types.ts'
 
 export const verify: RequestHandler = async ({ params }, response) => {
   const verificationTokenQuery = params.token

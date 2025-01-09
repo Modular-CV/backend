@@ -1,16 +1,16 @@
 import supertest from 'supertest'
-import server from '../../src/server'
+import server from '../../src/server.ts'
 import {
   createAccount,
   generateAccountInput,
   generateEntryDateInput,
   generateEntryLocationInput,
   generateSectionInput,
-} from '../utils'
-import { Route } from '../../src/types'
-import { routeParser } from '../../src/utils'
-import { faker } from '@faker-js/faker/.'
-import { EntryDate, Section, SkillLevel } from '@prisma/client'
+} from '../utils.ts'
+import { Route } from '../../src/types.ts'
+import { routeParser } from '../../src/utils.ts'
+import { faker } from '@faker-js/faker'
+import { type EntryDate, type Section, SkillLevel } from '@prisma/client'
 
 const serverInstance = server.listen()
 const request = supertest.agent(serverInstance)

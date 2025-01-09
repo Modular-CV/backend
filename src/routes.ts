@@ -1,7 +1,7 @@
 import express from 'express'
-import * as controllers from './controllers'
-import { authenticateSessionToken as authenticateSession } from './middlewares'
-import { Route } from './types'
+import * as controllers from './controllers/index.ts'
+import { authenticateSessionToken as authenticateSession } from './middlewares.ts'
+import { Route } from './types.ts'
 
 export const rootRouter = express.Router()
 
