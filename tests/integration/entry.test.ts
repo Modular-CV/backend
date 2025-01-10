@@ -10,7 +10,7 @@ import {
 import { Route } from '../../src/types.ts'
 import { routeParser } from '../../src/utils.ts'
 import { faker } from '@faker-js/faker'
-import { type EntryDate, type Section, SkillLevel } from '@prisma/client'
+import { type Section, SkillLevel } from '@prisma/client'
 
 const serverInstance = server.listen()
 const request = supertest.agent(serverInstance)
@@ -43,14 +43,147 @@ describe('GET ' + Route.mySectionEntries, () => {
 })
 
 describe('POST ' + Route.mySectionEntries, () => {
+  describe('Custom entry', () => {
+    test('should return status 200 and the entry id', async () => {
+      const sectionInput = generateSectionInput('CUSTOM')
+      const sectionResponse = await request
+        .post(Route.mySections)
+        .send(sectionInput)
+
+      const section: Section = sectionResponse.body.data.section
+
+      const customEntry: CustomEntryUncheckedCreateInput = {
+        entryType: 'CUSTOM',
+        isVisible: true,
+        customEntry: {
+          entryDate: generateEntryDateInput(),
+          entryLocation: generateEntryLocationInput(),
+          description: faker.lorem.paragraph(),
+          subtitle: faker.book.title(),
+          title: faker.book.title(),
+        },
+      }
+
+      const entryResponse = await request
+        .post(routeParser(Route.mySectionEntries, ':sectionId', section.id))
+        .send(customEntry)
+
+      expect(entryResponse.status).toBe(200)
+
+      const entry = entryResponse.body.data.entry
+
+      expect(entry.id).toBeTruthy()
+    })
+  })
+
+  describe('Education entry', () => {
+    test('should return status 200 and the entry id', async () => {
+      const sectionInput = generateSectionInput('EDUCATION')
+      const sectionResponse = await request
+        .post(Route.mySections)
+        .send(sectionInput)
+
+      const section = sectionResponse.body.data.section
+
+      const educationEntry: EducationEntryUncheckedCreateInput = {
+        entryType: 'EDUCATION',
+        isVisible: true,
+        educationEntry: {
+          entryDate: generateEntryDateInput(),
+          entryLocation: generateEntryLocationInput(),
+          degree: faker.person.jobTitle(),
+          description: faker.lorem.paragraph(),
+          school: faker.company.name(),
+        },
+      }
+
+      const entryResponse = await request
+        .post(routeParser(Route.mySectionEntries, ':sectionId', section.id))
+        .send(educationEntry)
+
+      expect(entryResponse.status).toBe(200)
+
+      const entry = entryResponse.body.data.entry
+
+      expect(entry.id).toBeTruthy()
+    })
+  })
+
+  describe('Course entry', () => {
+    test('should return status 200 and the entry id', async () => {
+      const sectionInput = generateSectionInput('COURSE')
+      const sectionResponse = await request
+        .post(Route.mySections)
+        .send(sectionInput)
+
+      const section: Section = sectionResponse.body.data.section
+
+      const courseEntry: CourseEntryUncheckedCreateInput = {
+        entryType: 'COURSE',
+        isVisible: true,
+        courseEntry: {
+          entryDate: generateEntryDateInput(),
+          entryLocation: generateEntryLocationInput(),
+          title: faker.book.title(),
+          description: faker.lorem.paragraph(),
+          institution: faker.company.name(),
+        },
+      }
+
+      const entryResponse = await request
+        .post(routeParser(Route.mySectionEntries, ':sectionId', section.id))
+        .send(courseEntry)
+
+      expect(entryResponse.status).toBe(200)
+
+      const entry = entryResponse.body.data.entry
+
+      expect(entry.id).toBeTruthy()
+    })
+  })
+
+  describe('Professional Experience entry', () => {
+    test('should return status 200 and the entry id', async () => {
+      const sectionInput = generateSectionInput('PROFESSIONAL_EXPERIENCE')
+      const sectionResponse = await request
+        .post(Route.mySections)
+        .send(sectionInput)
+
+      const section: Section = sectionResponse.body.data.section
+
+      const professionalExperienceEntry: ProfessionalExperienceEntryUncheckedCreateInput =
+        {
+          entryType: 'PROFESSIONAL_EXPERIENCE',
+          isVisible: true,
+          professionalExperienceEntry: {
+            entryDate: generateEntryDateInput(),
+            entryLocation: generateEntryLocationInput(),
+            description: faker.lorem.paragraph(),
+            employer: faker.company.name(),
+            jobTitle: faker.person.jobTitle(),
+          },
+        }
+
+      const entryResponse = await request
+        .post(routeParser(Route.mySectionEntries, ':sectionId', section.id))
+        .send(professionalExperienceEntry)
+
+      expect(entryResponse.status).toBe(200)
+
+      const entry = entryResponse.body.data.entry
+
+      expect(entry.id).toBeTruthy()
+    })
+  })
+
   describe('Project entry', () => {
-    test('should return status 200 and the skill id', async () => {
+    test('should return status 200 and the entry id', async () => {
       const sectionInput = generateSectionInput('PROJECT')
       const sectionResponse = await request
         .post(Route.mySections)
         .send(sectionInput)
 
-      const section: EntryDate = sectionResponse.body.data.section
+      const section: Section = sectionResponse.body.data.section
 
       const projectEntry: ProjectEntryUncheckedCreateInput = {
         entryType: 'PROJECT',
@@ -76,7 +209,7 @@ describe('POST ' + Route.mySectionEntries, () => {
   })
 
   describe('Skill entry', () => {
-    test('should return status 200 and the skill id', async () => {
+    test('should return status 200 and the entry id', async () => {
       const sectionInput = generateSectionInput('SKILL')
       const sectionResponse = await request
         .post(Route.mySections)
@@ -107,7 +240,7 @@ describe('POST ' + Route.mySectionEntries, () => {
   })
 
   describe('Course entry', () => {
-    test('should return status 200 and the course entry id', async () => {
+    test('should return status 200 and the entry id', async () => {
       const sectionInput = generateSectionInput('COURSE')
       const sectionResponse = await request
         .post(Route.mySections)
