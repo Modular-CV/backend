@@ -74,5 +74,5 @@ export const createAccount = async (
 /**
  * Used across multiple requests, typically to generate unique JWTs.
  */
-export const sleep = (timeout: number) =>
+export const sleep = (timeout = 1000) =>
   new Promise((resolve) => setTimeout(resolve, timeout))
