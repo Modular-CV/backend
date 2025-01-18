@@ -49,7 +49,7 @@ export const verify: RequestHandler = async ({ params }, response) => {
 export const get: RequestHandler = async ({ accessToken }, response) => {
   if (!accessToken) return
 
-  const account = prisma.account.findUnique({
+  const account = await prisma.account.findUnique({
     where: {
       id: accessToken.account.id,
     },
