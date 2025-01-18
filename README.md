@@ -4,8 +4,9 @@ This is the backend for a curriculum builder project: a modular and free-to-use 
 
 ## Project Documents
 
-- [Prisma Diagram](https://github.com/Modular-CV/backend/blob/main/docs/prisma-editor.png)
-- Endpoints (In Progress)
+- [GitBook](https://modular-cv.gitbook.io/backend)
+- [Prisma Diagram](https://modular-cv.gitbook.io/backend/prisma-diagram)
+- [Endpoints](https://modular-cv.gitbook.io/backend/api-endpoints)
 
 ## Tech Stack
 
