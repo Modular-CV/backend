@@ -46,3 +46,23 @@ describe('POST ' + Route.accounts, () => {
     // Wait for nodemailer to finish
   }, 10000)
 })
+
+describe('GET ' + Route.myAccount, () => {
+  test('should return status 200 and the account id, email and the password should be omitted', async () => {
+    const accountInput = generateAccountInput()
+
+    await createAccount(accountInput)
+
+    await request.post(Route.sessions).send(accountInput)
+
+    const response = await request.get(Route.myAccount)
+
+    expect(response.status).toBe(200)
+
+    const account = response.body.data.account
+
+    expect(account.id).toBeTruthy()
+    expect(account.email).toBe(accountInput.email)
+    expect(account.password).toBeFalsy()
+  })
+})
