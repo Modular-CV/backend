@@ -77,8 +77,6 @@ sectionRouter.post(
   controllers.section.postMySection,
 )
 
-export const entryRouter = express.Router()
-
 sectionRouter.get(
   Route.mySectionEntries,
   authenticateSession,
