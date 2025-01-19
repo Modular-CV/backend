@@ -31,7 +31,6 @@ export const postMyProfile: RequestHandler = async (
     email: z.string().optional(),
     phone: z.string().optional(),
     address: z.string().optional(),
-    Resume: z.object({}).optional(),
   }
 
   const validatorObject = z.object(
