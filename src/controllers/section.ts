@@ -3,8 +3,11 @@ import { prisma } from './index.ts'
 import { EntryType, Prisma } from '@prisma/client'
 import { ErrorCode } from '../types.ts'
 
-export const getMySections: RequestHandler = ({ accessToken }, response) => {
-  const sections = prisma.section.findMany({
+export const getMySections: RequestHandler = async (
+  { accessToken },
+  response,
+) => {
+  const sections = await prisma.section.findMany({
     where: {
       accountId: accessToken?.account.id,
     },
