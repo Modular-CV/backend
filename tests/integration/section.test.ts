@@ -21,9 +21,13 @@ afterAll(() => {
 })
 
 describe('GET ' + Route.mySections, () => {
-  test('should return 200', async () => {
+  test('should return 200 and an array', async () => {
     const response = await request.get(Route.mySections)
     expect(response.status).toBe(200)
+
+    const sections = response.body.data.sections
+
+    expect(Array.isArray(sections)).toBeTruthy()
   })
 })
 
