@@ -1,15 +1,19 @@
 import * as core from 'express-serve-static-core'
 import { RequestHandler as ExpressRequestHandler } from 'express'
 import { ZodIssue } from 'zod'
-import { ErrorCode } from './types'
+import { ErrorCode } from './types.ts'
 import { Account, type EntryType } from '@prisma/client'
 import { JwtPayload } from 'jsonwebtoken'
-import { Route } from './types'
-import TestAgent from 'supertest/lib/agent'
+import { Route } from './types.ts'
+import TestAgent from 'supertest/lib/agent.ts'
 import { Test } from 'supertest'
 import { Prisma } from '@prisma/client'
 
 declare global {
+  type RouteValues = (typeof Route)[keyof typeof Route]
+
+  type ErrorCodeValues = (typeof ErrorCode)[keyof typeof ErrorCode]
+
   type EntryUncheckedCreateInput<T extends EntryType = EntryType> = Omit<
     Prisma.EntryUncheckedCreateInput,
     'sectionId'
@@ -90,7 +94,7 @@ declare global {
         ? `:${Param}`
         : never
 
-  type RouteParser = <T extends Route>(
+  type RouteParser = <T extends RouteValues>(
     route: T,
     param: ExtractParams<T>,
     replace: string,
@@ -101,14 +105,14 @@ declare global {
   type CustomJwtPayload = { account: RequestAccount } & JwtPayload
 
   type SuperRequest = Omit<TestAgent, 'post' | 'get'> &
-    Record<'post' | 'get', (route: Route | ParsedRoute) => Test>
+    Record<'post' | 'get', (route: RouteValues | ParsedRoute) => Test>
 
   type ResponseBody<ErrorCode = keyof typeof ErrorCode | undefined> =
     ErrorCode extends undefined
       ? { status: 'SUCCESS'; data?: unknown; message?: string }
       : {
           status: 'ERROR'
-          message?: (typeof ErrorCode)[ErrorCode]
+          message?: ErrorCodeValues
           error: ErrorCode
           data?: { issues: ZodIssue[] } | { details: string }
         }
