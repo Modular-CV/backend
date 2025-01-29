@@ -128,15 +128,16 @@ declare global {
 
   namespace Express {
     interface Request {
-      accessToken?: CustomJwtPayload
+      accessToken?: string
+      jwtPayload?: CustomJwtPayload
     }
   }
 
   namespace NodeJS {
     interface ProcessEnv {
-      ADMINER_PORT: number | string
+      ADMINER_PORT: string
       DATABASE_NAME: string
-      DATABASE_PORT: number | string
+      DATABASE_PORT: string
       DATABASE_URL: string
       DOMAIN: string
       NODE_ENV: 'development' | 'production' | 'test'
@@ -145,12 +146,12 @@ declare global {
       NODE_MAILER_SERVICE: string
       NODE_MAILER_USER: string
       PEPPER_SECRET: string
-      PORT: number | string
+      PORT: string
       PROJECT_NAME: string
       ACCESS_TOKEN_SECRET: string
-      ACCESS_TOKEN_MAX_AGE: number | string
+      ACCESS_TOKEN_MAX_AGE: string
       REFRESH_TOKEN_SECRET: string
-      REFRESH_TOKEN_MAX_AGE: number | string
+      REFRESH_TOKEN_MAX_AGE: string
     }
   }
 }

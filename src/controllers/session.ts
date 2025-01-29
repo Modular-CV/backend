@@ -43,22 +43,33 @@ const generateSessionTokens = async (
 
   response.cookie('accessToken', accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: true,
+    sameSite: 'none',
     maxAge: Number(process.env.ACCESS_TOKEN_MAX_AGE),
   })
 
   response.cookie('refreshToken', refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: true,
+    sameSite: 'none',
     maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE),
     path: Route.refreshMySession,
   })
+
+  return {
+    accessToken,
+    refreshToken,
+  }
 }
 
-export const refresh: RequestHandler = async ({ cookies }, response) => {
-  const refreshToken: string = cookies['refreshToken']
+export const refresh: RequestHandler = async (
+  { cookies, headers },
+  response,
+) => {
+  const authRefreshToken = headers.authorization?.split(' ')[1]
+
+  const refreshToken: string | undefined =
+    cookies['refreshToken'] || authRefreshToken
 
   if (!refreshToken) {
     response.status(400).json({
@@ -139,20 +150,21 @@ export const refresh: RequestHandler = async ({ cookies }, response) => {
 
         const account = customPayload.account
 
-        await generateSessionTokens(response, account)
+        const tokens = await generateSessionTokens(response, account)
 
         response.json({
           status: 'SUCCESS',
+          data: tokens,
         })
       }
     },
   )
 }
 
-export const get: RequestHandler = async ({ accessToken }, response) => {
+export const get: RequestHandler = async ({ jwtPayload }, response) => {
   response.json({
     status: 'SUCCESS',
-    data: { accessToken },
+    data: { jwtPayload },
   })
 }
 
@@ -170,6 +182,9 @@ export const post: RequestHandler = async ({ body }, response) => {
       status: 'ERROR',
       message: ErrorCode['VAL-001'],
       error: 'VAL-001',
+      data: {
+        issues: validator.error.issues,
+      },
     })
     return
   }
@@ -216,9 +231,10 @@ export const post: RequestHandler = async ({ body }, response) => {
     return
   }
 
-  await generateSessionTokens(response, account)
+  const tokens = await generateSessionTokens(response, account)
 
   response.json({
     status: 'SUCCESS',
+    data: tokens,
   })
 }

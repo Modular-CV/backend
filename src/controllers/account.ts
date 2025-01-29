@@ -46,12 +46,10 @@ export const verify: RequestHandler = async ({ params }, response) => {
   })
 }
 
-export const get: RequestHandler = async ({ accessToken }, response) => {
-  if (!accessToken) return
-
+export const get: RequestHandler = async ({ jwtPayload }, response) => {
   const account = await prisma.account.findUnique({
     where: {
-      id: accessToken.account.id,
+      id: jwtPayload?.account.id,
     },
   })
 

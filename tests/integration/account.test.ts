@@ -53,9 +53,15 @@ describe('GET ' + Route.myAccount, () => {
 
     await createAccount(accountInput)
 
-    await request.post(Route.sessions).send(accountInput)
+    const sessionResponse = await request
+      .post(Route.sessions)
+      .send(accountInput)
 
-    const response = await request.get(Route.myAccount)
+    const token = sessionResponse.body.data.accessToken
+
+    const response = await request
+      .get(Route.myAccount)
+      .auth(token, { type: 'bearer' })
 
     expect(response.status).toBe(200)
 

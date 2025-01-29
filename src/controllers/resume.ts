@@ -4,12 +4,12 @@ import { Prisma } from '@prisma/client'
 import { ErrorCode } from '../types.ts'
 
 export const getMyResumes: RequestHandler = async (
-  { accessToken },
+  { jwtPayload },
   response,
 ) => {
   const resumes = await prisma.resume.findMany({
     where: {
-      accountId: accessToken?.account.id,
+      accountId: jwtPayload?.account.id,
     },
   })
 
@@ -22,11 +22,11 @@ export const getMyResumes: RequestHandler = async (
 }
 
 export const postMyResume: RequestHandler = async (
-  { accessToken, body },
+  { jwtPayload, body },
   response,
 ) => {
   const validatorObject = z.object({
-    title: z.string(),
+    title: z.string().trim().min(1),
   }) satisfies z.Schema<Prisma.ResumeUncheckedCreateWithoutAccountInput>
 
   const validator = validatorObject.safeParse(body)
@@ -49,7 +49,7 @@ export const postMyResume: RequestHandler = async (
   const resume = await prisma.resume.create({
     data: {
       ...data,
-      accountId: accessToken!.account.id,
+      accountId: jwtPayload!.account.id,
     },
   })
 

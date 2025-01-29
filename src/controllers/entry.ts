@@ -5,7 +5,7 @@ import { Prisma, SkillLevel } from '@prisma/client'
 import { normalizeOutput } from '../utils.ts'
 
 export const getMySectionEntries: RequestHandler = (
-  { accessToken, params },
+  { jwtPayload, params },
   response,
 ) => {
   const sectionId = params.sectionId
@@ -15,7 +15,7 @@ export const getMySectionEntries: RequestHandler = (
       sectionId: sectionId,
       Section: {
         Account: {
-          id: accessToken?.account.id,
+          id: jwtPayload?.account.id,
         },
       },
     },

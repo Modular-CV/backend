@@ -8,10 +8,14 @@ import { Route } from '../../src/types.ts'
 const serverInstance = server.listen()
 const request = supertest.agent(serverInstance)
 
+let accessToken = ''
+
 beforeAll(async () => {
   const account = generateAccountInput()
   await createAccount(account)
-  await request.post(Route.sessions).send(account)
+  const sessionResponse = await request.post(Route.sessions).send(account)
+
+  accessToken = sessionResponse.body.data.accessToken
 })
 
 afterAll(() => {
@@ -20,7 +24,10 @@ afterAll(() => {
 
 describe('GET' + Route.myProfiles, () => {
   test('should return status 200', async () => {
-    const response = await request.get(Route.myProfiles)
+    const response = await request
+      .get(Route.myProfiles)
+      .auth(accessToken, { type: 'bearer' })
+
     expect(response.status).toBe(200)
   })
 })
@@ -36,7 +43,10 @@ describe('POST' + Route.myProfiles, () => {
         address: faker.location.streetAddress(),
       })
 
-    const response = await request.post(Route.myProfiles).send(profileInput)
+    const response = await request
+      .post(Route.myProfiles)
+      .send(profileInput)
+      .auth(accessToken, { type: 'bearer' })
 
     expect(response.status).toBe(200)
 

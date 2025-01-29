@@ -3,10 +3,10 @@ import { prisma } from './index.ts'
 import { Prisma } from '@prisma/client'
 import { ErrorCode } from '../types.ts'
 
-export const getMyLinks: RequestHandler = async ({ accessToken }, response) => {
+export const getMyLinks: RequestHandler = async ({ jwtPayload }, response) => {
   const links = await prisma.link.findMany({
     where: {
-      accountId: accessToken?.account.id,
+      accountId: jwtPayload?.account.id,
     },
   })
 
@@ -19,7 +19,7 @@ export const getMyLinks: RequestHandler = async ({ accessToken }, response) => {
 }
 
 export const postMyLink: RequestHandler = async (
-  { body, accessToken },
+  { body, jwtPayload },
   response,
 ) => {
   const validatorObject = z.object({
@@ -45,7 +45,7 @@ export const postMyLink: RequestHandler = async (
   const link = await prisma.link.create({
     data: {
       ...data,
-      accountId: accessToken!.account.id,
+      accountId: jwtPayload!.account.id,
     },
   })
 

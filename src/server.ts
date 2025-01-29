@@ -9,6 +9,7 @@ server.use(express.json())
 server.use(cookieParser())
 server.use(
   cors({
+    credentials: true,
     origin: ['http://localhost:5173', 'http://localhost:5000'],
   }),
 )

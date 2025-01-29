@@ -4,12 +4,12 @@ import { EntryType, Prisma } from '@prisma/client'
 import { ErrorCode } from '../types.ts'
 
 export const getMySections: RequestHandler = async (
-  { accessToken },
+  { jwtPayload },
   response,
 ) => {
   const sections = await prisma.section.findMany({
     where: {
-      accountId: accessToken?.account.id,
+      accountId: jwtPayload?.account.id,
     },
   })
 
@@ -22,7 +22,7 @@ export const getMySections: RequestHandler = async (
 }
 
 export const postMySection: RequestHandler = async (
-  { accessToken, body },
+  { jwtPayload, body },
   response,
 ) => {
   const validatorObject = z.object({
@@ -49,7 +49,7 @@ export const postMySection: RequestHandler = async (
   const section = await prisma.section.create({
     data: {
       ...data,
-      accountId: accessToken!.account.id,
+      accountId: jwtPayload!.account.id,
     },
   })
 

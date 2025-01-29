@@ -4,12 +4,12 @@ import { Prisma } from '@prisma/client'
 import { ErrorCode } from '../types.ts'
 
 export const getMyProfiles: RequestHandler = async (
-  { accessToken },
+  { jwtPayload },
   response,
 ) => {
   const profiles = await prisma.profile.findMany({
     where: {
-      accountId: accessToken?.account.id,
+      accountId: jwtPayload?.account.id,
     },
   })
 
@@ -22,7 +22,7 @@ export const getMyProfiles: RequestHandler = async (
 }
 
 export const postMyProfile: RequestHandler = async (
-  { body, accessToken },
+  { body, jwtPayload },
   response,
 ) => {
   const inputs = {
@@ -56,7 +56,7 @@ export const postMyProfile: RequestHandler = async (
   const profile = await prisma.profile.create({
     data: {
       ...data,
-      accountId: accessToken!.account.id,
+      accountId: jwtPayload!.account.id,
     },
   })
 

@@ -10,7 +10,10 @@ export const authenticateSessionToken: RequestHandler = (
     throw new Error('token secret is not defined')
 
   const cookies = request.cookies
-  const accessToken: string = cookies['accessToken']
+
+  const token = request.headers.authorization?.split(' ')[1]
+
+  const accessToken: string | undefined = cookies['accessToken'] || token
 
   if (!accessToken) {
     response.status(400).json({
@@ -54,8 +57,10 @@ export const authenticateSessionToken: RequestHandler = (
       }
     }
 
-    if (typeof payload === 'object')
-      request.accessToken = payload as CustomJwtPayload
+    if (typeof payload === 'object') {
+      request.accessToken = accessToken
+      request.jwtPayload = payload as CustomJwtPayload
+    }
 
     next()
   })

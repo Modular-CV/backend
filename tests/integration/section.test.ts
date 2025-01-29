@@ -10,10 +10,14 @@ import { Route } from '../../src/types.ts'
 const serverInstance = server.listen()
 const request = supertest.agent(serverInstance)
 
+let accessToken = ''
+
 beforeAll(async () => {
   const account = generateAccountInput()
   await createAccount(account)
-  await request.post(Route.sessions).send(account)
+  const sessionResponse = await request.post(Route.sessions).send(account)
+
+  accessToken = sessionResponse.body.data.accessToken
 })
 
 afterAll(() => {
@@ -22,7 +26,9 @@ afterAll(() => {
 
 describe('GET ' + Route.mySections, () => {
   test('should return 200 and an array', async () => {
-    const response = await request.get(Route.mySections)
+    const response = await request.get(Route.mySections).auth(accessToken, {
+      type: 'bearer',
+    })
     expect(response.status).toBe(200)
 
     const sections = response.body.data.sections
@@ -34,7 +40,12 @@ describe('GET ' + Route.mySections, () => {
 describe('POST' + Route.mySections, () => {
   test('should return 200 and the section id', async () => {
     const sectionInput = generateSectionInput()
-    const response = await request.post(Route.mySections).send(sectionInput)
+    const response = await request
+      .post(Route.mySections)
+      .send(sectionInput)
+      .auth(accessToken, {
+        type: 'bearer',
+      })
 
     expect(response.status).toBe(200)
 

@@ -15,10 +15,14 @@ import { type Section, SkillLevel } from '@prisma/client'
 const serverInstance = server.listen()
 const request = supertest.agent(serverInstance)
 
+let accessToken = ''
+
 beforeAll(async () => {
   const account = generateAccountInput()
   await createAccount(account)
-  await request.post(Route.sessions).send(account)
+  const sessionResponse = await request.post(Route.sessions).send(account)
+
+  accessToken = sessionResponse.body.data.accessToken
 })
 
 afterAll(() => {
@@ -31,12 +35,13 @@ describe('GET ' + Route.mySectionEntries, () => {
     const sectionResponse = await request
       .post(Route.mySections)
       .send(sectionInput)
+      .auth(accessToken, { type: 'bearer' })
 
     const section: Section = sectionResponse.body.data.section
 
-    const entryResponse = await request.get(
-      routeParser(Route.mySectionEntries, ':sectionId', section.id),
-    )
+    const entryResponse = await request
+      .get(routeParser(Route.mySectionEntries, ':sectionId', section.id))
+      .auth(accessToken, { type: 'bearer' })
 
     expect(entryResponse.status).toBe(200)
   })
@@ -49,6 +54,7 @@ describe('POST ' + Route.mySectionEntries, () => {
       const sectionResponse = await request
         .post(Route.mySections)
         .send(sectionInput)
+        .auth(accessToken, { type: 'bearer' })
 
       const section: Section = sectionResponse.body.data.section
 
@@ -67,6 +73,7 @@ describe('POST ' + Route.mySectionEntries, () => {
       const entryResponse = await request
         .post(routeParser(Route.mySectionEntries, ':sectionId', section.id))
         .send(customEntry)
+        .auth(accessToken, { type: 'bearer' })
 
       expect(entryResponse.status).toBe(200)
 
@@ -82,6 +89,7 @@ describe('POST ' + Route.mySectionEntries, () => {
       const sectionResponse = await request
         .post(Route.mySections)
         .send(sectionInput)
+        .auth(accessToken, { type: 'bearer' })
 
       const section = sectionResponse.body.data.section
 
@@ -100,6 +108,7 @@ describe('POST ' + Route.mySectionEntries, () => {
       const entryResponse = await request
         .post(routeParser(Route.mySectionEntries, ':sectionId', section.id))
         .send(educationEntry)
+        .auth(accessToken, { type: 'bearer' })
 
       expect(entryResponse.status).toBe(200)
 
@@ -115,6 +124,7 @@ describe('POST ' + Route.mySectionEntries, () => {
       const sectionResponse = await request
         .post(Route.mySections)
         .send(sectionInput)
+        .auth(accessToken, { type: 'bearer' })
 
       const section: Section = sectionResponse.body.data.section
 
@@ -133,6 +143,7 @@ describe('POST ' + Route.mySectionEntries, () => {
       const entryResponse = await request
         .post(routeParser(Route.mySectionEntries, ':sectionId', section.id))
         .send(courseEntry)
+        .auth(accessToken, { type: 'bearer' })
 
       expect(entryResponse.status).toBe(200)
 
@@ -148,6 +159,7 @@ describe('POST ' + Route.mySectionEntries, () => {
       const sectionResponse = await request
         .post(Route.mySections)
         .send(sectionInput)
+        .auth(accessToken, { type: 'bearer' })
 
       const section: Section = sectionResponse.body.data.section
 
@@ -167,6 +179,7 @@ describe('POST ' + Route.mySectionEntries, () => {
       const entryResponse = await request
         .post(routeParser(Route.mySectionEntries, ':sectionId', section.id))
         .send(professionalExperienceEntry)
+        .auth(accessToken, { type: 'bearer' })
 
       expect(entryResponse.status).toBe(200)
 
@@ -182,6 +195,7 @@ describe('POST ' + Route.mySectionEntries, () => {
       const sectionResponse = await request
         .post(Route.mySections)
         .send(sectionInput)
+        .auth(accessToken, { type: 'bearer' })
 
       const section: Section = sectionResponse.body.data.section
 
@@ -199,6 +213,7 @@ describe('POST ' + Route.mySectionEntries, () => {
       const entryResponse = await request
         .post(routeParser(Route.mySectionEntries, ':sectionId', section.id))
         .send(projectEntry)
+        .auth(accessToken, { type: 'bearer' })
 
       expect(entryResponse.status).toBe(200)
 
@@ -214,6 +229,7 @@ describe('POST ' + Route.mySectionEntries, () => {
       const sectionResponse = await request
         .post(Route.mySections)
         .send(sectionInput)
+        .auth(accessToken, { type: 'bearer' })
 
       const section: Section = sectionResponse.body.data.section
 
@@ -230,6 +246,7 @@ describe('POST ' + Route.mySectionEntries, () => {
       const entryResponse = await request
         .post(routeParser(Route.mySectionEntries, ':sectionId', section.id))
         .send(skillEntryInput)
+        .auth(accessToken, { type: 'bearer' })
 
       expect(entryResponse.status).toBe(200)
 
@@ -245,6 +262,7 @@ describe('POST ' + Route.mySectionEntries, () => {
       const sectionResponse = await request
         .post(Route.mySections)
         .send(sectionInput)
+        .auth(accessToken, { type: 'bearer' })
 
       const section: Section = sectionResponse.body.data.section
 
@@ -263,6 +281,7 @@ describe('POST ' + Route.mySectionEntries, () => {
       const entryResponse = await request
         .post(routeParser(Route.mySectionEntries, ':sectionId', section.id))
         .send(courseEntryInput)
+        .auth(accessToken, { type: 'bearer' })
 
       expect(entryResponse.status).toBe(200)
 
