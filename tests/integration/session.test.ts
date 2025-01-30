@@ -37,7 +37,7 @@ describe('POST ' + Route.sessions, () => {
       expect(cookie.includes('Secure')).toBeTruthy()
     }
 
-    const { accessToken, refreshToken } = response.body.data
+    const { accessToken, refreshToken } = response.body.data.tokens
 
     expect(accessToken).toBeTruthy()
     expect(refreshToken).toBeTruthy()
@@ -66,19 +66,25 @@ describe('GET ' + Route.mySession, () => {
     expect(response.status).toBe(400)
   })
 
-  test('the expired cookie should be deleted from the browser. status should be 400', async () => {
+  test('should return status 400 for expired token', async () => {
     const originalAccessTokenMaxAge = process.env.ACCESS_TOKEN_MAX_AGE
     const seconds = 2 * 1000
 
     process.env.ACCESS_TOKEN_MAX_AGE = seconds.toString()
 
-    await request.post(Route.sessions).send(accountInput)
+    const sessionResponse = await request
+      .post(Route.sessions)
+      .send(accountInput)
+
+    const accessToken = sessionResponse.body.data.tokens.accessToken
 
     await sleep(seconds * 1.25)
 
-    const response = await request.get(Route.mySession)
+    const response = await request
+      .get(Route.mySession)
+      .auth(accessToken, { type: 'bearer' })
 
-    expect(response.status).toBe(400)
+    expect(response.status).toBe(401)
 
     process.env.ACCESS_TOKEN_MAX_AGE = originalAccessTokenMaxAge
   })
@@ -88,7 +94,7 @@ describe('GET ' + Route.mySession, () => {
       .post(Route.sessions)
       .send(accountInput)
 
-    const accessToken = sessionResponse.body.data.accessToken
+    const accessToken = sessionResponse.body.data.tokens.accessToken
 
     const response = await request.get(Route.mySession).auth(accessToken, {
       type: 'bearer',
@@ -121,7 +127,7 @@ describe('POST ' + Route.refreshMySession, () => {
       .post(Route.sessions)
       .send(accountInput)
 
-    const currentRefreshToken = sessionResponse.body.data.refreshToken
+    const currentRefreshToken = sessionResponse.body.data.tokens.refreshToken
 
     const response = await request
       .post(Route.refreshMySession)
@@ -131,8 +137,7 @@ describe('POST ' + Route.refreshMySession, () => {
     expect(cookies.length).toBe(2)
     expect(response.status).toBe(200)
 
-    const accessToken = response.body.data.accessToken
-    const refreshToken = response.body.data.refreshToken
+    const { accessToken, refreshToken } = response.body.data.tokens
 
     expect(accessToken).toBeTruthy()
     expect(refreshToken).toBeTruthy()
@@ -199,5 +204,45 @@ describe('POST ' + Route.refreshMySession, () => {
       .auth(oldRefreshToken, { type: 'bearer' })
 
     expect(refreshResponse.status).toBe(401)
+  })
+})
+
+describe('DELETE ' + Route.mySession, () => {
+  const accountInput = generateAccountInput()
+
+  beforeAll(async () => {
+    await createAccount(accountInput)
+  })
+
+  test('should return 200 and delete the tokens', async () => {
+    const sessionResponse = await request
+      .post(Route.sessions)
+      .send(accountInput)
+
+    console.log(sessionResponse.body)
+
+    const accessToken = sessionResponse.body.data.tokens.accessToken
+
+    const response = await request
+      .delete(Route.mySession)
+      .auth(accessToken, { type: 'bearer' })
+
+    expect(response.status).toBe(200)
+  })
+
+  test('after delete refreshToken, the refresh endpoint should return 401', async () => {
+    const sessionResponse = await request
+      .post(Route.sessions)
+      .send(accountInput)
+
+    const { accessToken, refreshToken } = sessionResponse.body.data.tokens
+
+    await request.delete(Route.mySession).auth(accessToken, { type: 'bearer' })
+
+    const response = await request
+      .post(Route.refreshMySession)
+      .auth(refreshToken, { type: 'bearer' })
+
+    expect(response.status).toBe(401)
   })
 })

@@ -10,6 +10,12 @@ import { ErrorCode } from '../types.ts'
 import jwt from 'jsonwebtoken'
 import { type CookieOptions, type Response } from 'express'
 
+const cookieOptions: CookieOptions = {
+  httpOnly: true,
+  secure: true,
+  sameSite: 'none',
+}
+
 /**
  * This function will mutate the response object
  */
@@ -40,12 +46,6 @@ const generateSessionTokens = async (
       accountId: account.id,
     },
   })
-
-  const cookieOptions: CookieOptions = {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
-  }
 
   response.cookie('accessToken', accessToken, {
     ...cookieOptions,
@@ -237,5 +237,27 @@ export const post: RequestHandler = async ({ body }, response) => {
   response.json({
     status: 'SUCCESS',
     data: { tokens },
+  })
+}
+
+export const remove: RequestHandler = async ({ jwtPayload }, response) => {
+  await prisma.refreshToken.delete({
+    where: {
+      accountId: jwtPayload?.account.id,
+    },
+  })
+
+  response.cookie('refreshToken', '', {
+    ...cookieOptions,
+    maxAge: 0,
+  })
+
+  response.cookie('accessToken', '', {
+    ...cookieOptions,
+    maxAge: 0,
+  })
+
+  response.json({
+    status: 'SUCCESS',
   })
 }

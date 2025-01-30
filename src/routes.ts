@@ -26,6 +26,11 @@ sessionsRouter.get(
 )
 sessionsRouter.post(Route.refreshMySession, controllers.session.refresh)
 sessionsRouter.post(Route.sessions, controllers.session.post)
+sessionsRouter.delete(
+  Route.mySession,
+  authenticateSession,
+  controllers.session.remove,
+)
 
 export const resumeRouter = express.Router()
 
