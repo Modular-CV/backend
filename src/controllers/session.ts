@@ -6,9 +6,9 @@ import {
   hashString,
   verifyHashedString,
 } from '../utils.ts'
-import { ErrorCode, Route } from '../types.ts'
+import { ErrorCode } from '../types.ts'
 import jwt from 'jsonwebtoken'
-import { type Response } from 'express'
+import { type CookieOptions, type Response } from 'express'
 
 /**
  * This function will mutate the response object
@@ -41,19 +41,20 @@ const generateSessionTokens = async (
     },
   })
 
-  response.cookie('accessToken', accessToken, {
+  const cookieOptions: CookieOptions = {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
+  }
+
+  response.cookie('accessToken', accessToken, {
+    ...cookieOptions,
     maxAge: Number(process.env.ACCESS_TOKEN_MAX_AGE),
   })
 
   response.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    ...cookieOptions,
     maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE),
-    path: Route.refreshMySession,
   })
 
   return {
@@ -154,7 +155,7 @@ export const refresh: RequestHandler = async (
 
         response.json({
           status: 'SUCCESS',
-          data: tokens,
+          data: { tokens },
         })
       }
     },
@@ -235,6 +236,6 @@ export const post: RequestHandler = async ({ body }, response) => {
 
   response.json({
     status: 'SUCCESS',
-    data: tokens,
+    data: { tokens },
   })
 }
