@@ -57,7 +57,7 @@ describe('GET ' + Route.myAccount, () => {
       .post(Route.sessions)
       .send(accountInput)
 
-    const token = sessionResponse.body.data.accessToken
+    const token = sessionResponse.body.data.tokens.accessToken
 
     const response = await request
       .get(Route.myAccount)

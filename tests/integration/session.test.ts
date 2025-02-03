@@ -219,8 +219,6 @@ describe('DELETE ' + Route.mySession, () => {
       .post(Route.sessions)
       .send(accountInput)
 
-    console.log(sessionResponse.body)
-
     const accessToken = sessionResponse.body.data.tokens.accessToken
 
     const response = await request

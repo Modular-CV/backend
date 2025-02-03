@@ -14,7 +14,7 @@ beforeAll(async () => {
   const account = generateAccountInput()
   await createAccount(account)
   const sessionResponse = await request.post(Route.sessions).send(account)
-  accessToken = sessionResponse.body.data.accessToken
+  accessToken = sessionResponse.body.data.tokens.accessToken
 })
 
 afterAll(() => {
